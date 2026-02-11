@@ -3,18 +3,20 @@ import type { Coordinates } from '../hooks/useGeolocation';
 
 export function addLocationMarker(
   mapRef: GebetaMapRef,
-  location: Coordinates
+  location: Coordinates,
+  label: string = 'Your Location',
+  markerIcon: string = '/pin.svg'
 ): void {
   mapRef.clearMarkers();
 
   mapRef.addImageMarker(
     location,
-    '/pin.svg',
+    markerIcon,
     [30, 30],
     () => {
-      console.log('User location marker clicked!');
+      console.log('Marker clicked!');
     },
     10,
-    '<b>Your Location</b>'
+    `<b>${label}</b>`
   );
 }
