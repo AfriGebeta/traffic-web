@@ -1,36 +1,55 @@
+import { useState } from 'react';
 import { Compass, Plus } from 'lucide-react';
 import { colors } from '@/shared/theme/colors';
+import { ContributeForm } from '@/modules/places/components/ContributeForm';
 
 export function BottomSheet() {
-    return (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[1000]">
-            <div className="bg-white rounded-2xl shadow-2xl px-6 py-3 border border-gray-200">
-                <div className="flex items-center gap-8">
-                    <button
-                        className="flex flex-col items-center gap-1 transition-all"
-                    >
-                        <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center transition-all"
-                            style={{ backgroundColor: colors.primary.main }}
-                        >
-                            <Compass size={20} color="white" />
-                        </div>
-                        <span className="text-xs text-gray-700">Explore</span>
-                    </button>
+    const [showContributeForm, setShowContributeForm] = useState(false);
 
-                    <button
-                        className="flex flex-col items-center gap-1 transition-all"
-                    >
-                        <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center transition-all"
-                            style={{ backgroundColor: colors.primary.main }}
+    const handleContributeSuccess = () => {
+        setShowContributeForm(false);
+        alert('Place submitted successfully!');
+    };
+
+    return (
+        <>
+            <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[1000]">
+                <div className="bg-white rounded-2xl shadow-2xl px-6 py-3 border border-gray-200">
+                    <div className="flex items-center gap-8">
+                        <button
+                            className="flex flex-col items-center gap-1 transition-all"
                         >
-                            <Plus size={20} color="white" />
-                        </div>
-                        <span className="text-xs text-gray-700">Contribute</span>
-                    </button>
+                            <div
+                                className="w-12 h-12 rounded-full flex items-center justify-center transition-all"
+                                style={{ backgroundColor: colors.primary.main }}
+                            >
+                                <Compass size={20} color="white" />
+                            </div>
+                            <span className="text-xs text-gray-700">Explore</span>
+                        </button>
+
+                        <button
+                            onClick={() => setShowContributeForm(true)}
+                            className="flex flex-col items-center gap-1 transition-all"
+                        >
+                            <div
+                                className="w-12 h-12 rounded-full flex items-center justify-center transition-all"
+                                style={{ backgroundColor: colors.primary.main }}
+                            >
+                                <Plus size={20} color="white" />
+                            </div>
+                            <span className="text-xs text-gray-700">Contribute</span>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            {showContributeForm && (
+                <ContributeForm
+                    onClose={() => setShowContributeForm(false)}
+                    onSuccess={handleContributeSuccess}
+                />
+            )}
+        </>
     );
 }
