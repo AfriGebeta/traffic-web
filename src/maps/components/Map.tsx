@@ -7,6 +7,7 @@ import { PlaceModal } from './PlaceModal';
 import { NearbyCategories } from '../../modules/nearby/components/NearbyCategories';
 import { NearbyPlacesList } from '../../modules/nearby/components/NearbyPlacesList';
 import { AuthAvatar } from '../../modules/auth/signup/components/auth-avatar';
+import { BottomSheet } from '../../components/BottomSheet';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useSearch } from '../hooks/useSearch';
 import { addLocationMarker } from '../utils/mapMarkers';
@@ -250,6 +251,8 @@ export function Map() {
       <div className="absolute bottom-4 left-4 z-[1000]">
         <AuthAvatar />
       </div>
+
+      <BottomSheet />
     </div>
   );
 }
