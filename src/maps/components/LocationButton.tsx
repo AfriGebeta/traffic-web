@@ -1,4 +1,4 @@
-import { Target } from 'lucide-react';
+import { Crosshair } from 'lucide-react';
 
 interface LocationButtonProps {
     onClick: () => void;
@@ -40,7 +40,7 @@ export function LocationButton({ onClick, isLocating }: LocationButtonProps) {
                     e.currentTarget.style.transform = 'scale(1)';
                 }}
             >
-                <Target
+                <Crosshair
                     size={20}
                     color={isLocating ? '#9ca3af' : '#374151'}
                     style={{
