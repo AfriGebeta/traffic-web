@@ -7,10 +7,10 @@ interface MapStyleButtonProps {
 }
 
 const MAP_STYLES = [
-  { name: 'Default', value: 'default' },
-  { name: 'Custom', value: '/map-styles/custom.json' },
-  { name: 'Dark', value: '/map-styles/dark-custom.json' },
-  { name: 'Raster', value: '/map-styles/raster.json' },
+  { name: 'Default', value: 'default', image: '/src/assets/default.JPG' },
+  { name: 'Custom', value: '/map-styles/custom.json', image: '/src/assets/custom.JPG' },
+  { name: 'Dark', value: '/map-styles/dark-custom.json', image: '/src/assets/dark.JPG' },
+  { name: 'Satellite', value: '/map-styles/raster.json', image: '/src/assets/raster.JPG' },
 ];
 
 export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonProps) {
@@ -65,7 +65,7 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
             borderRadius: '8px',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
             padding: '8px',
-            minWidth: '140px',
+            minWidth: '180px',
             zIndex: 1001,
           }}
         >
@@ -74,7 +74,9 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
               key={style.value}
               onClick={() => handleStyleSelect(style.value)}
               style={{
-                display: 'block',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
                 width: '100%',
                 padding: '8px 12px',
                 textAlign: 'left',
@@ -97,7 +99,18 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
                 }
               }}
             >
-              {style.name}
+              <img 
+                src={style.image} 
+                alt={style.name}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '4px',
+                  objectFit: 'cover',
+                  border: '1px solid #e5e7eb'
+                }}
+              />
+              <span>{style.name}</span>
             </button>
           ))}
         </div>
