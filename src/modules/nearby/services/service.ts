@@ -1,5 +1,5 @@
 import { api } from '@/shared/services/api';
-import type { NearbyRequest, NearbyResponse, NearbyPlace } from '../types/types';
+import type { NearbyResponse, NearbyPlace } from '../types/types';
 
 export async function searchNearbyPlaces(
   lat: number,

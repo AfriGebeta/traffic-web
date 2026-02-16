@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User } from 'lucide-react';
+import { User, Download } from 'lucide-react';
 import {
     Popover,
     PopoverContent,
@@ -50,6 +50,13 @@ export function AuthAvatar() {
                                 <div className="font-medium text-gray-900">{user.points}</div>
                             </div>
 
+                            <button
+                                onClick={() => alert('App coming soon!')}
+                                className="w-full py-1.5 px-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm text-left flex items-center gap-2"
+                            >
+                                <Download size={16} />
+                                <span>Download App</span>
+                            </button>
 
                             <button
                                 onClick={handleLogout}
@@ -76,11 +83,13 @@ export function AuthAvatar() {
                             </button>
 
                             <button
-                                onClick={() => alert('Leaderboard coming soon!')}
-                                className="w-full p-2 rounded-lg hover:bg-gray-100 transition-colors text-sm text-left"
+                                onClick={() => alert('App coming soon!')}
+                                className="w-full p-2 rounded-lg hover:bg-gray-100 transition-colors text-sm text-left flex items-center gap-2"
                             >
-                                <span>Leaderboard</span>
+                                <Download size={16} />
+                                <span>Download App</span>
                             </button>
+
                         </>
                     )}
                 </div>
