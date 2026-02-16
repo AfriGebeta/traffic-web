@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, Share2 } from 'lucide-react';
 import type { Place } from '../types/place';
 import { colors } from '@/shared/theme/colors';
 
@@ -9,6 +9,26 @@ interface PlaceModalProps {
 }
 
 export function PlaceModal({ place, onClose, onDirections }: PlaceModalProps) {
+  const handleShare = async () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('lat', place.latitude.toString());
+    url.searchParams.set('lng', place.longitude.toString());
+    url.searchParams.set('name', encodeURIComponent(place.name));
+    url.searchParams.set('city', place.City);
+    url.searchParams.set('country', place.Country);
+    url.searchParams.set('type', place.type);
+    
+    const shareUrl = url.toString();
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('Link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      alert('Failed to copy link');
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
       <div className="relative p-4 border-b border-gray-200">
@@ -45,7 +65,7 @@ export function PlaceModal({ place, onClose, onDirections }: PlaceModalProps) {
         </div>
       </div>
 
-      <div className="p-4 pt-2">
+      <div className="p-4 pt-2 space-y-2">
         <button
           onClick={onDirections}
           className="w-full text-white font-medium py-2.5 px-4 rounded-xl transition-colors"
@@ -58,6 +78,14 @@ export function PlaceModal({ place, onClose, onDirections }: PlaceModalProps) {
           }}
         >
           Directions
+        </button>
+        
+        <button
+          onClick={handleShare}
+          className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+        >
+          <Share2 size={18} />
+          Share
         </button>
       </div>
     </div>

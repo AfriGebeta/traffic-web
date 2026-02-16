@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import GebetaMap from '@gebeta/tiles';
 import type { GebetaMapRef } from '@gebeta/tiles';
 import { LocationButton } from './LocationButton';
@@ -33,6 +33,30 @@ export function Map() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey | null>(null);
   const [nearbyPlaces, setNearbyPlaces] = useState<NearbyPlace[]>([]);
   const [showNearbyList, setShowNearbyList] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const lat = params.get('lat');
+    const lng = params.get('lng');
+    const name = params.get('name');
+    
+    if (lat && lng && name) {
+      const place: Place = {
+        name: decodeURIComponent(name),
+        latitude: parseFloat(lat),
+        longitude: parseFloat(lng),
+        City: params.get('city') || '',
+        Country: params.get('country') || '',
+        type: params.get('type') || 'place',
+      };
+      
+      setSelectedPlace(place);
+      
+      if (mapRef.current) {
+        addLocationMarker(mapRef.current, [place.longitude, place.latitude], place.name, '/pin.svg');
+      }
+    }
+  }, []);
 
   const handleLocationClick = async () => {
     try {
