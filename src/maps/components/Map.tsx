@@ -55,7 +55,7 @@ export function Map() {
       setSelectedPlace(place);
       
       if (mapRef.current) {
-        addLocationMarker(mapRef.current, [place.longitude, place.latitude], place.name, '/src/assets/location-pin.svg');
+        addLocationMarker(mapRef.current, [place.longitude, place.latitude], place.name, '/assets/location-pin.svg');
       }
     }
   }, []);
@@ -102,7 +102,7 @@ export function Map() {
         });
       }
 
-      addLocationMarker(mapRef.current, location, place.name, '/src/assets/location-pin.svg');
+      addLocationMarker(mapRef.current, location, place.name, '/assets/location-pin.svg');
       setSelectedPlace(place);
     }
   };
@@ -177,7 +177,7 @@ export function Map() {
       map.clearMarkers();
       map.addImageMarker(
         [place.longitude, place.latitude],
-        '/src/assets/location-pin.svg',
+        '/assets/location-pin.svg',
         [30, 30],
         () => { },
         10,
@@ -226,7 +226,7 @@ export function Map() {
       
       map.addImageMarker(
         [place.longitude, place.latitude],
-        '/src/assets/location-pin.svg',
+        '/assets/location-pin.svg',
         [30, 30],
         () => { },
         10,

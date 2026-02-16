@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { register } from '../services/signup.service';
 import { colors } from '@/shared/theme/colors';
-import faviconImage from '@/assets/gebetamaps.png';
 
 interface SignupFormProps {
   onSuccess: () => void;
@@ -109,7 +108,7 @@ export function SignupForm({ onSuccess, className, ...props }: SignupFormProps &
           </form>
           <div className="bg-muted relative hidden md:flex md:items-center md:justify-center">
             <img
-              src={faviconImage}
+              src="/assets/gebetamaps.png"
               alt="Logo"
               className="w-58 h-58 object-contain"
             />
