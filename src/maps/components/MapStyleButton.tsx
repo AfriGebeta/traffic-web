@@ -7,10 +7,10 @@ interface MapStyleButtonProps {
 }
 
 const MAP_STYLES = [
-  { name: 'Default', value: 'default', image: '/src/assets/default.JPG' },
-  { name: 'Custom', value: '/map-styles/custom.json', image: '/src/assets/custom.JPG' },
-  { name: 'Dark', value: '/map-styles/dark-custom.json', image: '/src/assets/dark.JPG' },
-  { name: 'Satellite', value: '/map-styles/raster.json', image: '/src/assets/raster.JPG' },
+  { name: 'Default', value: 'default', image: '/assets/default.JPG' },
+  { name: 'Custom', value: '/map-styles/custom.json', image: '/assets/custom.JPG' },
+  { name: 'Dark', value: '/map-styles/dark-custom.json', image: '/assets/dark.JPG' },
+  { name: 'Satellite', value: '/map-styles/raster.json', image: '/assets/raster.JPG' },
 ];
 
 export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonProps) {

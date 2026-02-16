@@ -28,27 +28,27 @@ export const PLACE_CATEGORIES = {
     restaurants: {
         id: 'restaurant',
         label: 'Restaurants',
-        markerIcon: '/src/assets/restaurant.png'
+        markerIcon: '/assets/restaurant.png'
     },
     gas: {
         id: 'gas station',
         label: 'Gas Stations',
-        markerIcon: '/src/assets/gas-station.png'
+        markerIcon: '/assets/gas-station.png'
     },
     parking: {
         id: 'parking',
         label: 'Parking',
-        markerIcon: '/src/assets/parking.png'
+        markerIcon: '/assets/parking.png'
     },
     hospital: {
         id: 'hospital',
         label: 'Hospitals',
-        markerIcon: '/src/assets/hospital.png'
+        markerIcon: '/assets/hospital.png'
     },
     repair: {
         id: 'car repair',
         label: 'Repair Shops',
-        markerIcon: '/src/assets/repair-shop.png'
+        markerIcon: '/assets/repair-shop.png'
     },
 } as const;
 
