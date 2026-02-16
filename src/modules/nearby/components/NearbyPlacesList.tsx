@@ -1,16 +1,18 @@
-import { MapPin } from 'lucide-react';
+import { MapPin, X } from 'lucide-react';
 import type { NearbyPlace } from '../types/types';
 
 interface NearbyPlacesListProps {
   places: NearbyPlace[];
   isLoading: boolean;
   onPlaceClick: (place: NearbyPlace) => void;
+  onClose?: () => void;
 }
 
 export function NearbyPlacesList({
   places,
   isLoading,
   onPlaceClick,
+  onClose,
 }: NearbyPlacesListProps) {
   if (isLoading) {
     return (
@@ -29,8 +31,20 @@ export function NearbyPlacesList({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-md max-h-96 overflow-y-auto">
-      {places.map((place, index) => (
+    <div className="bg-white rounded-2xl shadow-md">
+      {onClose && (
+        <div className="flex items-center justify-between p-3 border-b border-gray-100">
+          <span className="text-sm font-medium text-gray-700">Nearby Places</span>
+          <button
+            onClick={onClose}
+            className="hover:bg-gray-100 rounded-full p-1 transition-colors"
+          >
+            <X size={18} className="text-gray-700" />
+          </button>
+        </div>
+      )}
+      <div className="max-h-64 overflow-y-auto">
+        {places.map((place, index) => (
         <div
           key={`${place.name}-${index}`}
           onClick={() => onPlaceClick(place)}
@@ -48,6 +62,7 @@ export function NearbyPlacesList({
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 }

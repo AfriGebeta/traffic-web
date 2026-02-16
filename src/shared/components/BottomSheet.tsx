@@ -2,13 +2,49 @@ import { useState } from 'react';
 import { Compass, Plus } from 'lucide-react';
 import { colors } from '@/shared/theme/colors';
 import { ContributeForm } from '@/modules/places/components/ContributeForm';
+import { ExploreDrawer } from '@/modules/explore/components/ExploreDrawer';
 
-export function BottomSheet() {
+interface BottomSheetProps {
+    userLocation: [number, number] | null;
+    onExplorePlaceClick: (place: any) => void;
+}
+
+export function BottomSheet({ userLocation, onExplorePlaceClick }: BottomSheetProps) {
     const [showContributeForm, setShowContributeForm] = useState(false);
+    const [showExploreDrawer, setShowExploreDrawer] = useState(false);
+    const [exploreLocation, setExploreLocation] = useState<{ lat: number; lng: number } | null>(null);
 
     const handleContributeSuccess = () => {
         setShowContributeForm(false);
         alert('Place submitted successfully!');
+    };
+
+    const handleExploreClick = () => {
+        if (!userLocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const loc = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    setExploreLocation(loc);
+                    setShowExploreDrawer(true);
+                },
+                (error) => {
+                    console.error('Error getting location:', error);
+                    setShowExploreDrawer(true);
+                }
+            );
+        } else {
+            const loc = { lng: userLocation[0], lat: userLocation[1] };
+            setExploreLocation(loc);
+            setShowExploreDrawer(true);
+        }
+    };
+
+    const handlePlaceClick = (place: any) => {
+        onExplorePlaceClick(place);
+        setShowExploreDrawer(false);
     };
 
     return (
@@ -17,6 +53,7 @@ export function BottomSheet() {
                 <div className="bg-white rounded-2xl shadow-2xl px-6 py-3 border border-gray-200">
                     <div className="flex items-center gap-8">
                         <button
+                            onClick={handleExploreClick}
                             className="flex flex-col items-center gap-1 transition-all"
                         >
                             <div
@@ -50,6 +87,13 @@ export function BottomSheet() {
                     onSuccess={handleContributeSuccess}
                 />
             )}
+
+            <ExploreDrawer
+                open={showExploreDrawer}
+                onOpenChange={setShowExploreDrawer}
+                userLocation={exploreLocation}
+                onPlaceClick={handlePlaceClick}
+            />
         </>
     );
 }

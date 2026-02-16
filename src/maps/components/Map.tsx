@@ -7,7 +7,7 @@ import { PlaceModal } from './PlaceModal';
 import { NearbyCategories } from '../../modules/nearby/components/NearbyCategories';
 import { NearbyPlacesList } from '../../modules/nearby/components/NearbyPlacesList';
 import { AuthAvatar } from '../../modules/auth/signup/components/auth-avatar';
-import { BottomSheet } from '../../components/BottomSheet';
+import { BottomSheet } from '../../shared/components/BottomSheet';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useSearch } from '../hooks/useSearch';
 import { addLocationMarker } from '../utils/mapMarkers';
@@ -131,6 +131,32 @@ export function Map() {
     setSelectedPlace(placeData);
   };
 
+  const handleExplorePlaceClick = (place: any) => {
+    if (mapRef.current) {
+      const map = mapRef.current as any;
+      map.clearMarkers();
+      
+      map.addImageMarker(
+        [place.longitude, place.latitude],
+        '/pin.svg',
+        [30, 30],
+        () => {},
+        10,
+        `<b>${place.name}</b>`
+      );
+    }
+
+    const placeData: Place = {
+      name: place.name,
+      latitude: place.latitude,
+      longitude: place.longitude,
+      City: place.City,
+      Country: place.Country,
+      type: place.type || 'explore',
+    };
+    setSelectedPlace(placeData);
+  };
+
   const handleDirections = async () => {
     if (!selectedPlace) return;
 
@@ -158,10 +184,8 @@ export function Map() {
         const map = mapRef.current as any;
         map.addPath(routeCoordinates, '#ffa500', 5);
 
-        // Add animated marker
         map.clearMarkers();
 
-        // Start animation
         if (animationCleanup.current) {
           animationCleanup.current();
         }
@@ -201,20 +225,29 @@ export function Map() {
       />
 
       <div className="absolute top-4 left-4 right-12 z-[1000] pointer-events-none">
-        <div className="flex flex-col lg:flex-row gap-2">
-          {/* Search Box */}
-          <div className="w-full lg:w-[30%] pointer-events-auto">
-            <SearchBox
-              onPlaceSelect={handlePlaceSelect}
-              isSearching={isSearching}
-              results={results}
-              onSearch={search}
-              onClear={clearResults}
-              selectedPlace={selectedPlace}
-            />
+        <div className="flex flex-col lg:flex-row lg:items-start gap-2">
+          <div className="w-full lg:w-[30%]">
+            <div className="pointer-events-auto">
+              <SearchBox
+                onPlaceSelect={handlePlaceSelect}
+                isSearching={isSearching}
+                results={results}
+                onSearch={search}
+                onClear={clearResults}
+                selectedPlace={selectedPlace}
+              />
+            </div>
+
+            <div className="mt-2 lg:hidden pointer-events-auto">
+              <NearbyCategories
+                selectedCategory={selectedCategory}
+                onCategorySelect={handleCategorySelect}
+                onClearCategory={handleClearCategory}
+              />
+            </div>
 
             {selectedPlace && (
-              <div className="mt-2">
+              <div className="mt-2 pointer-events-auto">
                 <PlaceModal
                   place={selectedPlace}
                   onClose={handleCloseModal}
@@ -223,20 +256,19 @@ export function Map() {
               </div>
             )}
 
-            {/* Nearby Places List - under search */}
-            {showNearbyList && nearbyPlaces.length > 0 && (
-              <div className="mt-2">
+            {showNearbyList && nearbyPlaces.length > 0 && !selectedPlace && (
+              <div className="mt-2 pointer-events-auto">
                 <NearbyPlacesList
                   places={nearbyPlaces}
                   isLoading={false}
                   onPlaceClick={handleNearbyPlaceClick}
+                  onClose={handleClearCategory}
                 />
               </div>
             )}
           </div>
 
-          {/* Nearby Categories - stays at top right */}
-          <div className="w-full lg:flex-1 pointer-events-auto">
+          <div className="hidden lg:block w-full lg:flex-1 pointer-events-auto">
             <NearbyCategories
               selectedCategory={selectedCategory}
               onCategorySelect={handleCategorySelect}
@@ -252,7 +284,10 @@ export function Map() {
         <AuthAvatar />
       </div>
 
-      <BottomSheet />
+      <BottomSheet 
+        userLocation={userLocation}
+        onExplorePlaceClick={handleExplorePlaceClick}
+      />
     </div>
   );
 }
