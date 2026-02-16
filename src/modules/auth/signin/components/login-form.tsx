@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { login } from '../services/login.service';
 import { colors } from '@/shared/theme/colors';
-import faviconImage from '@/assets/gebetamaps.png';
 
 interface LoginFormProps {
   onSuccess: () => void;
@@ -109,7 +108,7 @@ export function LoginForm({ onSuccess, className, ...props }: LoginFormProps & R
           </form>
           <div className="bg-muted relative hidden md:flex md:items-center md:justify-center">
             <img
-              src={faviconImage}
+              src="/assets/gebetamaps.png"
               alt="Logo"
               className="w-58 h-58 object-contain"
             />
