@@ -13,7 +13,7 @@ export function NearbyCategories({
   onClearCategory,
 }: NearbyCategoriesProps) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2 items-center">
+    <div className="flex gap-2 overflow-x-auto pb-2 items-center no-scrollbar">
       {(Object.keys(PLACE_CATEGORIES) as CategoryKey[]).map((key) => {
         const category = PLACE_CATEGORIES[key];
         const isSelected = selectedCategory === key;
