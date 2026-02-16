@@ -50,12 +50,6 @@ export function AuthAvatar() {
                                 <div className="font-medium text-gray-900">{user.points}</div>
                             </div>
 
-                            <button
-                                onClick={() => alert('Leaderboard coming soon!')}
-                                className="w-full p-2 rounded-lg hover:bg-gray-100 transition-colors text-sm text-left"
-                            >
-                                <span>Leaderboard</span>
-                            </button>
 
                             <button
                                 onClick={handleLogout}

@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import GebetaMap from '@gebeta/tiles';
 import type { GebetaMapRef } from '@gebeta/tiles';
 import { LocationButton } from './LocationButton';
+import { MapStyleButton } from './MapStyleButton';
 import { SearchBox } from './SearchBox';
 import { PlaceModal } from './PlaceModal';
 import { NearbyCategories } from '../../modules/nearby/components/NearbyCategories';
@@ -33,6 +34,31 @@ export function Map() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey | null>(null);
   const [nearbyPlaces, setNearbyPlaces] = useState<NearbyPlace[]>([]);
   const [showNearbyList, setShowNearbyList] = useState(false);
+  const [mapStyle, setMapStyle] = useState<string>('default');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const lat = params.get('lat');
+    const lng = params.get('lng');
+    const name = params.get('name');
+    
+    if (lat && lng && name) {
+      const place: Place = {
+        name: decodeURIComponent(name),
+        latitude: parseFloat(lat),
+        longitude: parseFloat(lng),
+        City: params.get('city') || '',
+        Country: params.get('country') || '',
+        type: params.get('type') || 'place',
+      };
+      
+      setSelectedPlace(place);
+      
+      if (mapRef.current) {
+        addLocationMarker(mapRef.current, [place.longitude, place.latitude], place.name, '/src/assets/location-pin.svg');
+      }
+    }
+  }, []);
 
   const handleLocationClick = async () => {
     try {
@@ -40,6 +66,18 @@ export function Map() {
       setUserLocation(location);
 
       if (mapRef.current) {
+        const map = mapRef.current as any;
+        const mapInstance = map.getMapInstance();
+        if (mapInstance && mapInstance.flyTo) {
+          mapInstance.flyTo({
+            center: location,
+            zoom: 15,
+            essential: true,
+            speed: 2,
+            curve: 1
+          });
+        }
+
         addLocationMarker(mapRef.current, location, 'your Location', '/pin.svg');
       }
     } catch (error) {
@@ -51,6 +89,19 @@ export function Map() {
   const handlePlaceSelect = (place: Place) => {
     if (mapRef.current) {
       const location: [number, number] = [place.longitude, place.latitude];
+
+      const map = mapRef.current as any;
+      const mapInstance = map.getMapInstance();
+      if (mapInstance && mapInstance.flyTo) {
+        mapInstance.flyTo({
+          center: location,
+          zoom: 17,
+          essential: true,
+          speed: 2,
+          curve: 1
+        });
+      }
+
       addLocationMarker(mapRef.current, location, place.name, '/src/assets/location-pin.svg');
       setSelectedPlace(place);
     }
@@ -120,6 +171,31 @@ export function Map() {
   };
 
   const handleNearbyPlaceClick = (place: NearbyPlace) => {
+    if (mapRef.current) {
+      const map = mapRef.current as any;
+
+      map.clearMarkers();
+      map.addImageMarker(
+        [place.longitude, place.latitude],
+        '/src/assets/location-pin.svg',
+        [30, 30],
+        () => { },
+        10,
+        `<b>${place.name}</b>`
+      );
+
+      const mapInstance = map.getMapInstance();
+      if (mapInstance && mapInstance.flyTo) {
+        mapInstance.flyTo({
+          center: [place.longitude, place.latitude],
+          zoom: 17,
+          essential: true,
+          speed: 2,
+          curve: 1
+        });
+      }
+    }
+
     const placeData: Place = {
       name: place.name,
       latitude: place.latitude,
@@ -134,16 +210,30 @@ export function Map() {
   const handleExplorePlaceClick = (place: any) => {
     if (mapRef.current) {
       const map = mapRef.current as any;
+
+      const mapInstance = map.getMapInstance();
+      if (mapInstance && mapInstance.flyTo) {
+        mapInstance.flyTo({
+          center: [place.longitude, place.latitude],
+          zoom: 17,
+          essential: true,
+          speed: 2,
+          curve: 1
+        });
+      }
+
       map.clearMarkers();
       
       map.addImageMarker(
         [place.longitude, place.latitude],
-        '/pin.svg',
+        '/src/assets/location-pin.svg',
         [30, 30],
-        () => {},
+        () => { },
         10,
         `<b>${place.name}</b>`
       );
+    } else {
+      console.error('error!');
     }
 
     const placeData: Place = {
@@ -215,6 +305,25 @@ export function Map() {
     }
   };
 
+  const handleStyleChange = (styleUrl: string) => {
+    setMapStyle(styleUrl);
+
+    if (mapRef.current) {
+      const map = mapRef.current as any;
+      const mapInstance = map.getMapInstance();
+
+      if (mapInstance && mapInstance.setStyle) {
+        const actualStyleUrl = styleUrl === 'default'
+          ? 'https://tiles.gebeta.app/styles/standard/style.json'
+          : styleUrl;
+
+        mapInstance.setStyle(actualStyleUrl);
+      } else {
+        console.error('Map instance or setStyle not available');
+      }
+    }
+  };
+
   return (
     <div className="h-screen w-screen overflow-hidden relative">
       <GebetaMap
@@ -279,12 +388,13 @@ export function Map() {
       </div>
 
       <LocationButton onClick={handleLocationClick} isLocating={isLocating} />
+      <MapStyleButton onStyleChange={handleStyleChange} currentStyle={mapStyle} />
 
       <div className="absolute bottom-4 left-4 z-[1000]">
         <AuthAvatar />
       </div>
 
-      <BottomSheet 
+      <BottomSheet
         userLocation={userLocation}
         onExplorePlaceClick={handleExplorePlaceClick}
       />
