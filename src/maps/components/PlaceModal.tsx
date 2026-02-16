@@ -35,7 +35,8 @@ export function PlaceModal({ place, onClose, onDirections }: PlaceModalProps) {
         <h2 className="text-lg font-bold text-gray-900 pr-8">{place.name}</h2>
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 hover:bg-gray-100 rounded-full p-1 transition-colors"
+          className="absolute top-4 right-4 hover:bg-gray-100 rounded-full p-1 transition-colors z-10 cursor-pointer"
+          style={{ pointerEvents: 'auto' }}
         >
           <X size={18} className="text-gray-700" />
         </button>
