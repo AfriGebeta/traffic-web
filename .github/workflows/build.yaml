@@ -27,6 +27,9 @@ jobs:
       # 4️⃣ Build React app
       - name: Build React app
         run: npm run build
+        env:
+          VITE_GEBETA_API_KEY: ${{ secrets.VITE_GEBETA_API_KEY }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       # 5️⃣ Clean old dist files on VPS
       - name: Clean old dist folder
