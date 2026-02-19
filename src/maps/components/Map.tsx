@@ -333,10 +333,10 @@ export function Map() {
         zoom={12}
       />
 
-      <div className="absolute top-4 left-4 right-12 z-[1000] pointer-events-none">
+      <div className="z-[1000] pointer-events-none">
         <div className="flex flex-col lg:flex-row lg:items-start gap-2">
-          <div className="w-full lg:w-[30%]">
-            <div className="pointer-events-auto">
+          <div className="">
+            <div className="absolute top-4 left-4 right-0 md:right-12 pointer-events-auto">
               <SearchBox
                 onPlaceSelect={handlePlaceSelect}
                 isSearching={isSearching}
@@ -347,7 +347,7 @@ export function Map() {
               />
             </div>
 
-            <div className="mt-2 lg:hidden pointer-events-auto">
+            <div className="absolute top-16 md:top-[12px] left-0 md:left-[460px] right-0 md:right-12 mt-2 pointer-events-auto">
               <NearbyCategories
                 selectedCategory={selectedCategory}
                 onCategorySelect={handleCategorySelect}
