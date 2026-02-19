@@ -32,6 +32,6 @@ jobs:
   deploy-prod-step:
     needs: build-step
     uses: ./.github/workflows/deploy-prod.yaml
-    secrets: inherit
     with:
       ref: ${{ github.ref }}
+    secrets: inherit
