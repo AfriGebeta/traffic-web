@@ -2,10 +2,6 @@ name: Build React App
 
 on:
   workflow_call:
-    inputs:
-      build_env:
-        required: true
-        type: string
 
 jobs:
   build:

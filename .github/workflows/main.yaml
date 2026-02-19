@@ -4,34 +4,16 @@ on:
   push:
     branches:
       - main
-  release:
-    types: [published]
 
 jobs:
-  setup_envs:
-    runs-on: ubuntu-latest
-    outputs:
-      build_env: ${{ steps.set_env.outputs.build_env }}
-    steps:
-      - name: Decide environment
-        id: decide_env
-        run: |
-          echo "PROD" >> $GITHUB_OUTPUT
-      - name: Set environment
-        id: set_env
-        run: |
-          echo "build_env=PROD" >> $GITHUB_OUTPUT
-          echo "BUILD_ENV=PROD" >> $GITHUB_ENV
-
   build-step:
-    needs: setup_envs
+    runs-on: ubuntu-latest
     uses: ./.github/workflows/build.yaml
-    with:
-      build_env: ${{ needs.setup_envs.outputs.build_env }}
 
-  deploy-prod-step:
+  deploy-step:
     needs: build-step
-    uses: ./.github/workflows/deploy-prod.yaml
+    runs-on: ubuntu-latest
+    uses: ./.github/workflows/deploy.yaml
     with:
       ref: ${{ github.ref }}
     secrets: inherit
