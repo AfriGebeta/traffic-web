@@ -41,7 +41,7 @@ export function Map() {
     const lat = params.get('lat');
     const lng = params.get('lng');
     const name = params.get('name');
-    
+
     if (lat && lng && name) {
       const place: Place = {
         name: decodeURIComponent(name),
@@ -51,9 +51,9 @@ export function Map() {
         Country: params.get('country') || '',
         type: params.get('type') || 'place',
       };
-      
+
       setSelectedPlace(place);
-      
+
       if (mapRef.current) {
         addLocationMarker(mapRef.current, [place.longitude, place.latitude], place.name, '/assets/location-pin.svg');
       }
@@ -223,7 +223,7 @@ export function Map() {
       }
 
       map.clearMarkers();
-      
+
       map.addImageMarker(
         [place.longitude, place.latitude],
         '/assets/location-pin.svg',
@@ -319,7 +319,7 @@ export function Map() {
 
         mapInstance.setStyle(actualStyleUrl);
       } else {
-        console.error('Map instance or setStyle not available');
+        console.error('Map style not available');
       }
     }
   };
@@ -329,14 +329,14 @@ export function Map() {
       <GebetaMap
         ref={mapRef}
         apiKey={apiKey}
-        center={[38.7578, 8.9806]}
+        center={[38.7685, 9.0161]}
         zoom={12}
       />
 
       <div className="z-[1000] pointer-events-none">
         <div className="flex flex-col lg:flex-row lg:items-start gap-2">
           <div className="">
-            <div className="absolute top-4 left-4 right-0 md:right-12 pointer-events-auto">
+            <div className="absolute top-4 left-4 right-18 md:right-12 pointer-events-auto">
               <SearchBox
                 onPlaceSelect={handlePlaceSelect}
                 isSearching={isSearching}
@@ -390,7 +390,7 @@ export function Map() {
       <LocationButton onClick={handleLocationClick} isLocating={isLocating} />
       <MapStyleButton onStyleChange={handleStyleChange} currentStyle={mapStyle} />
 
-      <div className="absolute bottom-4 left-4 z-[1000]">
+      <div className="absolute top-4 right-4 z-[1000]">
         <AuthAvatar />
       </div>
 
@@ -398,6 +398,26 @@ export function Map() {
         userLocation={userLocation}
         onExplorePlaceClick={handleExplorePlaceClick}
       />
+
+      <style>{`
+        .maplibregl-ctrl-top-right {
+          top: auto !important;
+          bottom: 130px !important;
+          right: 15px !important;
+        }
+        
+        @media (max-width: 1024px) {
+          .maplibregl-ctrl-top-right {
+            bottom: 124px !important;
+            right: 15px !important
+          }
+        }
+
+        .maplibregl-ctrl-bottom-right,
+        .maplibregl-ctrl-attrib {
+          display: none !important;
+        }
+      `}</style>
     </div>
   );
 }

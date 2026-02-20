@@ -11,7 +11,7 @@ export function LocationButton({ onClick, isLocating }: LocationButtonProps) {
             <button
                 onClick={onClick}
                 disabled={isLocating}
-                className="location-button"
+                className="location-button lg:!bottom-[64px]"
                 style={{
                     position: 'absolute',
                     bottom: '20px',
@@ -27,7 +27,7 @@ export function LocationButton({ onClick, isLocating }: LocationButtonProps) {
                     alignItems: 'center',
                     justifyContent: 'center',
                     transition: 'all 0.2s',
-                    zIndex: 1000,
+                    zIndex: 1100,
                 }}
                 onMouseEnter={(e) => {
                     if (!isLocating) {

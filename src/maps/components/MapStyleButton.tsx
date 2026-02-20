@@ -25,7 +25,7 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
     <div style={{ position: 'relative' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="map-style-button"
+        className="map-style-button lg:!bottom-[66px]"
         style={{
           position: 'absolute',
           bottom: '66px',
@@ -41,7 +41,7 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
           alignItems: 'center',
           justifyContent: 'center',
           transition: 'all 0.2s',
-          zIndex: 1000,
+          zIndex: 1100,
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = '#f3f4f6';
