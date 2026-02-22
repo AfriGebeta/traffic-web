@@ -49,9 +49,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "dist/*"          
-          target: "${{ secrets.APP_PATH }}/dist"
-          recursive: true
-
+          target: "${{ secrets.APP_PATH }}"
 
       # 7️ Reload Nginx to serve the new build
       - name: Reload Nginx
