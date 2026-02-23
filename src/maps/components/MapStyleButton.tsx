@@ -25,7 +25,7 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
     <div style={{ position: 'relative' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="map-style-button lg:!bottom-[66px]"
+        className="map-style-button lg:!bottom-[30px]"
         style={{
           position: 'fixed',
           bottom: '66px',
@@ -99,8 +99,8 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
                 }
               }}
             >
-              <img 
-                src={style.image} 
+              <img
+                src={style.image}
                 alt={style.name}
                 style={{
                   width: '32px',

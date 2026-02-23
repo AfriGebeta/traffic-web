@@ -407,9 +407,9 @@ export function Map() {
           right: 15px !important;
         }
         
-        @media (max-width: 1024px) {
+        @media (min-width: 1024px) {
           .maplibregl-ctrl-top-right {
-            bottom: 144px !important;
+            bottom: 124px !important;
             right: 15px !important
           }
         }
