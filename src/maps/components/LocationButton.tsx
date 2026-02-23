@@ -11,9 +11,9 @@ export function LocationButton({ onClick, isLocating }: LocationButtonProps) {
             <button
                 onClick={onClick}
                 disabled={isLocating}
-                className="location-button lg:!bottom-[64px]"
+                className="location-button lg:!bottom-[112px]"
                 style={{
-                    position: 'absolute',
+                    position: 'fixed',
                     bottom: '20px',
                     right: '20px',
                     width: '36px',

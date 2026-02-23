@@ -27,7 +27,7 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
         onClick={() => setIsOpen(!isOpen)}
         className="map-style-button lg:!bottom-[66px]"
         style={{
-          position: 'absolute',
+          position: 'fixed',
           bottom: '66px',
           right: '20px',
           width: '36px',
@@ -58,7 +58,7 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
       {isOpen && (
         <div
           style={{
-            position: 'absolute',
+            position: 'fixed',
             bottom: '66px',
             right: '66px',
             backgroundColor: 'white',

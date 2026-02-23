@@ -402,13 +402,13 @@ export function Map() {
       <style>{`
         .maplibregl-ctrl-top-right {
           top: auto !important;
-          bottom: 130px !important;
+          bottom: 160px !important;
           right: 15px !important;
         }
         
         @media (max-width: 1024px) {
           .maplibregl-ctrl-top-right {
-            bottom: 124px !important;
+            bottom: 144px !important;
             right: 15px !important
           }
         }
