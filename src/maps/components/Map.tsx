@@ -401,6 +401,7 @@ export function Map() {
 
       <style>{`
         .maplibregl-ctrl-top-right {
+          position: fixed !important;
           top: auto !important;
           bottom: 160px !important;
           right: 15px !important;
