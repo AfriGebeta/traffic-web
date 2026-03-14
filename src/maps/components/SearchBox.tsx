@@ -60,7 +60,7 @@ export function SearchBox({
     };
 
     return (
-        <div ref={searchRef} className="relative w-full">
+        <div ref={searchRef} className="relative w-full max-w-md">
             <div className="flex items-center bg-white rounded-2xl shadow-md px-4 py-3 gap-3">
                 <input
                     type="text"

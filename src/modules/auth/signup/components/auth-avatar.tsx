@@ -28,10 +28,10 @@ export function AuthAvatar() {
         <Popover>
             <PopoverTrigger asChild>
                 <button
-                    className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-100 transition-colors font-semibold text-lg"
-                    style={{ borderWidth: '2px', borderStyle: 'solid', borderColor: colors.primary.main, color: colors.primary.main }}
+                    className="w-10 h-10 rounded-full shadow-lg flex items-center justify-center hover:opacity-90 transition-colors font-semibold text-base"
+                    style={{ backgroundColor: colors.primary.main, color: 'white' }}
                 >
-                    {user ? user.name.charAt(0).toUpperCase() : <User size={24} style={{ color: colors.primary.main }} />}
+                    {user ? user.name.charAt(0).toUpperCase() : <User size={20} color="white" />}
                 </button>
             </PopoverTrigger>
             <PopoverContent side="right" align="start" className="w-48 p-2">

@@ -1,5 +1,5 @@
 import { api } from '@/shared/services/api';
-import type { NavigationRequest, NavigationResponse } from './types';
+import type { NavigationResponse } from './types';
 
 export async function getNavigation(
   origin: [number, number],

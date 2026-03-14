@@ -1,5 +1,4 @@
 export function animateMarkerAlongRoute({
-  map,
   coordinates,
   duration = 6000,
   onUpdate,

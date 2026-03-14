@@ -25,9 +25,9 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
     <div style={{ position: 'relative' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="map-style-button"
+        className="map-style-button lg:!bottom-[30px]"
         style={{
-          position: 'absolute',
+          position: 'fixed',
           bottom: '66px',
           right: '20px',
           width: '36px',
@@ -41,7 +41,7 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
           alignItems: 'center',
           justifyContent: 'center',
           transition: 'all 0.2s',
-          zIndex: 1000,
+          zIndex: 1100,
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = '#f3f4f6';
@@ -58,7 +58,7 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
       {isOpen && (
         <div
           style={{
-            position: 'absolute',
+            position: 'fixed',
             bottom: '66px',
             right: '66px',
             backgroundColor: 'white',
@@ -99,8 +99,8 @@ export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonPr
                 }
               }}
             >
-              <img 
-                src={style.image} 
+              <img
+                src={style.image}
                 alt={style.name}
                 style={{
                   width: '32px',
