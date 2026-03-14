@@ -21,7 +21,7 @@ interface LoginFormProps {
 export function LoginForm({ onSuccess, className, ...props }: LoginFormProps & React.ComponentProps<"div">) {
   const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -31,7 +31,7 @@ export function LoginForm({ onSuccess, className, ...props }: LoginFormProps & R
     setIsLoading(true);
 
     try {
-      await login({ phoneNumber, name });
+      await login({ phoneNumber, password });
       onSuccess();
     } catch (err) {
       setError('Failed to login. Please try again.');
@@ -54,21 +54,6 @@ export function LoginForm({ onSuccess, className, ...props }: LoginFormProps & R
                 </p>
               </div>
               <Field>
-                <FieldLabel htmlFor="name">Name</FieldLabel>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Your Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="focus:!border-[#fde2aeff] focus:!shadow-[0_1px_3px_0_#fde2aeff] focus-visible:!ring-0"
-                />
-                <FieldDescription>
-                  Enter your username
-                </FieldDescription>
-              </Field>
-              <Field>
                 <FieldLabel htmlFor="phone">Phone Number</FieldLabel>
                 <Input
                   id="phone"
@@ -82,6 +67,18 @@ export function LoginForm({ onSuccess, className, ...props }: LoginFormProps & R
                 <FieldDescription>
                   Enter your phone number.
                 </FieldDescription>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="focus:!border-[#fde2aeff] focus:!shadow-[0_1px_3px_0_#fde2aeff] focus-visible:!ring-0"
+                />
               </Field>
               {error && (
                 <div className="text-sm text-red-600 bg-red-50 p-3 rounded">

@@ -15,4 +15,5 @@ export interface AuthResponse {
 export interface RegisterRequest {
   phoneNumber: string;
   name: string;
+  password: string;
 }

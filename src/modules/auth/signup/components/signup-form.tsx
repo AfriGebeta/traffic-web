@@ -1,41 +1,50 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { register } from '../services/signup.service';
-import { colors } from '@/shared/theme/colors';
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { register } from "../services/signup.service";
+import { colors } from "@/shared/theme/colors";
 
 interface SignupFormProps {
   onSuccess: () => void;
   className?: string;
 }
 
-export function SignupForm({ onSuccess, className, ...props }: SignupFormProps & React.ComponentProps<"div">) {
+export function SignupForm({
+  onSuccess,
+  className,
+  ...props
+}: SignupFormProps & React.ComponentProps<"div">) {
   const navigate = useNavigate();
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [name, setName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     try {
-      await register({ phoneNumber, name });
+      await register({ phoneNumber, name, password });
       onSuccess();
     } catch (err) {
-      setError('Failed to register. Please try again.');
-      console.error('Registration error:', err);
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to register. Please try again.";
+      setError(message);
+      console.error("Registration error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -79,9 +88,19 @@ export function SignupForm({ onSuccess, className, ...props }: SignupFormProps &
                   required
                   className="focus:!border-[#fde2aeff] focus:!shadow-[0_1px_3px_0_#fde2aeff] focus-visible:!ring-0"
                 />
-                <FieldDescription>
-                  Your phone number.
-                </FieldDescription>
+                <FieldDescription>Your phone number.</FieldDescription>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="focus:!border-[#fde2aeff] focus:!shadow-[0_1px_3px_0_#fde2aeff] focus-visible:!ring-0"
+                />
               </Field>
               {error && (
                 <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
@@ -95,13 +114,19 @@ export function SignupForm({ onSuccess, className, ...props }: SignupFormProps &
                   style={{ backgroundColor: colors.primary.main }}
                   className="text-white"
                 >
-                  {isLoading ? 'Creating account...' : 'Create Account'}
+                  {isLoading ? "Creating account..." : "Create Account"}
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                Already have an account?{' '}
-                <a href="#" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
-                  Back to Map
+                Already have an account?{" "}
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate("/login");
+                  }}
+                >
+                  Login
                 </a>
               </FieldDescription>
             </FieldGroup>
@@ -116,7 +141,7 @@ export function SignupForm({ onSuccess, className, ...props }: SignupFormProps &
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{' '}
+        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.
       </FieldDescription>
     </div>
