@@ -9,7 +9,7 @@ export interface User {
 
 export interface LoginRequest {
   phoneNumber: string;
-  name: string;
+  password: string;
 }
 
 export interface LoginResponse {

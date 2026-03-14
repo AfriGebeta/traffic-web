@@ -26,7 +26,16 @@ async function request<T>(
     });
 
     if (!response.ok) {
-        throw new Error(`API Error: ${response.statusText}`);
+        let message = response.statusText;
+        try {
+            const body = await response.json();
+            message = body.message || body.error || message;
+        } catch {
+            // keep status text
+        }
+        const err = new Error(message) as Error & { status: number };
+        err.status = response.status;
+        throw err;
     }
 
     return response.json();
