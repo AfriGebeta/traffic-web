@@ -113,8 +113,10 @@ export function LoginForm({ onSuccess, className, ...props }: LoginFormProps & R
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{' '}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our{' '}
+        <a href="#" onClick={(e) => { e.preventDefault(); navigate('/terms'); }}>Terms of Service</a>{' '}
+        and{' '}
+        <a href="#" onClick={(e) => { e.preventDefault(); navigate('/privacy'); }}>Privacy Policy</a>.
       </FieldDescription>
     </div>
   );
