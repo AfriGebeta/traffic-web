@@ -36,7 +36,7 @@ export function SignupForm({
     setIsLoading(true);
 
     try {
-      await register({ phoneNumber, name, password });
+      await register({ phoneNumber: `+251${phoneNumber}`, name, password });
       onSuccess();
     } catch (err) {
       const message =
@@ -79,15 +79,18 @@ export function SignupForm({
               </Field>
               <Field>
                 <FieldLabel htmlFor="phone">Phone Number</FieldLabel>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="+251912345678"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  required
-                  className="focus:!border-[#fde2aeff] focus:!shadow-[0_1px_3px_0_#fde2aeff] focus-visible:!ring-0"
-                />
+                <div className="flex items-center border border-input rounded-md overflow-hidden focus-within:border-[#fde2aeff] focus-within:shadow-[0_1px_3px_0_#fde2aeff]">
+                  <span className="px-3 py-2 bg-muted text-muted-foreground text-sm border-r border-input select-none">+251</span>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="912345678"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    required
+                    className="border-0 rounded-none focus:!border-0 focus:!shadow-none focus-visible:!ring-0"
+                  />
+                </div>
                 <FieldDescription>Your phone number.</FieldDescription>
               </Field>
               <Field>
