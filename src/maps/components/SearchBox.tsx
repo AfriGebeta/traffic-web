@@ -8,7 +8,6 @@ interface SearchBoxProps {
     results: Place[];
     onSearch: (query: string) => void;
     onClear: () => void;
-    selectedPlace: Place | null;
 }
 
 export function SearchBox({
@@ -17,7 +16,6 @@ export function SearchBox({
     results,
     onSearch,
     onClear,
-    selectedPlace,
 }: SearchBoxProps) {
     const [query, setQuery] = useState('');
     const [showResults, setShowResults] = useState(false);
