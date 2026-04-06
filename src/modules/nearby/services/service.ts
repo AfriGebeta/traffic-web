@@ -8,6 +8,7 @@ export async function searchNearbyPlaces(
   cursor: number = 0,
   limit: number = 20
 ): Promise<NearbyPlace[]> {
+  
   const response = await api.post<NearbyResponse>(
     '/api/navigation/request-revgeocoding',
     {
@@ -17,6 +18,7 @@ export async function searchNearbyPlaces(
       limit,
     }
   );
+
 
   return response.response || response.results || response.data || [];
 }
