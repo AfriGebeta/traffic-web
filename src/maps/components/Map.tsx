@@ -400,7 +400,6 @@ export function Map() {
                 results={results}
                 onSearch={search}
                 onClear={clearResults}
-                selectedPlace={selectedPlace}
               />
             </div>
 
