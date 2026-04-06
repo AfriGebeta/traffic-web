@@ -50,6 +50,7 @@ export function SearchBox({
 
     const handlePlaceClick = (place: Place) => {
         setQuery(place.name);
+        setShowResults(false);
         onPlaceSelect(place);
     };
 
@@ -82,7 +83,7 @@ export function SearchBox({
                 <Search size={20} className="text-gray-600 flex-shrink-0" />
             </div>
 
-            {showResults && query && !selectedPlace && (
+            {showResults && query && (
                 <>
                     {isSearching ? (
                         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg z-[9999] border border-gray-200 px-4 py-6 text-center">

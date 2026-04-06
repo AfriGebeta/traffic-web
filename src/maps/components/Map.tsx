@@ -1,27 +1,56 @@
-import { useRef, useState, useEffect } from 'react';
-import GebetaMap from '@gebeta/tiles';
-import type { GebetaMapRef } from '@gebeta/tiles';
-import { LocationButton } from './LocationButton';
-import { MapStyleButton } from './MapStyleButton';
-import { SearchBox } from './SearchBox';
-import { PlaceModal } from './PlaceModal';
-import { NearbyCategories } from '../../modules/nearby/components/NearbyCategories';
-import { NearbyPlacesList } from '../../modules/nearby/components/NearbyPlacesList';
-import { AuthAvatar } from '../../modules/auth/signup/components/auth-avatar';
-import { BottomSheet } from '../../shared/components/BottomSheet';
-import { useGeolocation } from '../hooks/useGeolocation';
-import { useSearch } from '../hooks/useSearch';
-import { addLocationMarker } from '../utils/mapMarkers';
-import { getNavigation } from '../navigation/service';
-import { decodePolyline } from '@/shared/utils/polyline';
-import { animateMarkerAlongRoute } from '../utils/animateMarker';
-import { searchNearbyPlaces } from '../../modules/nearby/services/service';
-import { PLACE_CATEGORIES, type CategoryKey } from '../../modules/nearby/types/types';
-import type { Place } from '../types/place';
-import type { NearbyPlace } from '../../modules/nearby/types/types';
-import type { Coordinates } from '../hooks/useGeolocation';
+
+import { useRef, useState, useEffect } from "react";
+import GebetaMap from "@gebeta/tiles";
+import type { GebetaMapRef } from "@gebeta/tiles";
+import { LocationButton } from "./LocationButton";
+import { MapStyleButton } from "./MapStyleButton";
+import { SearchBox } from "./SearchBox";
+import { PlaceModal } from "./PlaceModal";
+import { NearbyCategories } from "../../modules/nearby/components/NearbyCategories";
+import { NearbyPlacesList } from "../../modules/nearby/components/NearbyPlacesList";
+import { AuthAvatar } from "../../modules/auth/signup/components/auth-avatar";
+import { BottomSheet } from "../../shared/components/BottomSheet";
+import { useGeolocation } from "../hooks/useGeolocation";
+import { useSearch } from "../hooks/useSearch";
+import { addLocationMarker } from "../utils/mapMarkers";
+import { getNavigation } from "../navigation/service";
+import { decodePolyline } from "@/shared/utils/polyline";
+import { animateMarkerAlongRoute } from "../utils/animateMarker";
+import { searchNearbyPlaces } from "../../modules/nearby/services/service";
+import {
+  PLACE_CATEGORIES,
+  type CategoryKey,
+} from "../../modules/nearby/types/types";
+import type { Place } from "../types/place";
+import type { NearbyPlace } from "../../modules/nearby/types/types";
+import type { Coordinates } from "../hooks/useGeolocation";
 
 const apiKey = import.meta.env.VITE_GEBETA_API_KEY;
+
+interface MapInstance {
+  getMapInstance: () => {
+    flyTo: (options: {
+      center: [number, number];
+      zoom: number;
+      essential: boolean;
+      speed: number;
+      curve: number;
+    }) => void;
+    setStyle: (styleUrl: string) => void;
+  };
+  clearMarkers: () => void;
+  clearRoute: () => void;
+  clearPaths: () => void;
+  addImageMarker: (
+    position: [number, number],
+    icon: string,
+    size: [number, number],
+    onClick: () => void,
+    zIndex: number,
+    popup: string,
+  ) => void;
+  addPath: (coordinates: [number, number][], color: string, width: number) => void;
+}
 
 export function Map() {
   const mapRef = useRef<GebetaMapRef>(null);
@@ -31,32 +60,41 @@ export function Map() {
   const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
   const animationCleanup = useRef<(() => void) | null>(null);
 
-  const [selectedCategory, setSelectedCategory] = useState<CategoryKey | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryKey | null>(
+    null,
+  );
   const [nearbyPlaces, setNearbyPlaces] = useState<NearbyPlace[]>([]);
   const [showNearbyList, setShowNearbyList] = useState(false);
-  const [mapStyle, setMapStyle] = useState<string>('default');
+  const [mapStyle, setMapStyle] = useState<string>("default");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const lat = params.get('lat');
-    const lng = params.get('lng');
-    const name = params.get('name');
+    const lat = params.get("lat");
+    const lng = params.get("lng");
+    const name = params.get("name");
 
     if (lat && lng && name) {
       const place: Place = {
         name: decodeURIComponent(name),
         latitude: parseFloat(lat),
         longitude: parseFloat(lng),
-        City: params.get('city') || '',
-        Country: params.get('country') || '',
-        type: params.get('type') || 'place',
+        City: params.get("city") || "",
+        Country: params.get("country") || "",
+        type: params.get("type") || "place",
       };
 
-      setSelectedPlace(place);
+      setTimeout(() => {
+        setSelectedPlace(place);
 
-      if (mapRef.current) {
-        addLocationMarker(mapRef.current, [place.longitude, place.latitude], place.name, '/assets/location-pin.svg');
-      }
+        if (mapRef.current) {
+          addLocationMarker(
+            mapRef.current,
+            [place.longitude, place.latitude],
+            place.name,
+            "/assets/location-pin.svg",
+          );
+        }
+      }, 0);
     }
   }, []);
 
@@ -66,7 +104,7 @@ export function Map() {
       setUserLocation(location);
 
       if (mapRef.current) {
-        const map = mapRef.current as any;
+        const map = mapRef.current as unknown as MapInstance;
         const mapInstance = map.getMapInstance();
         if (mapInstance && mapInstance.flyTo) {
           mapInstance.flyTo({
@@ -74,15 +112,20 @@ export function Map() {
             zoom: 15,
             essential: true,
             speed: 2,
-            curve: 1
+            curve: 1,
           });
         }
 
-        addLocationMarker(mapRef.current, location, 'your Location', '/pin.svg');
+        addLocationMarker(
+          mapRef.current,
+          location,
+          "your Location",
+          "/pin.svg",
+        );
       }
     } catch (error) {
-      console.error('error getting location:', error);
-      alert('unable to get your location. please enable location services.');
+      console.error("error getting location:", error);
+      alert("unable to get your location. please enable location services.");
     }
   };
 
@@ -90,7 +133,7 @@ export function Map() {
     if (mapRef.current) {
       const location: [number, number] = [place.longitude, place.latitude];
 
-      const map = mapRef.current as any;
+      const map = mapRef.current as unknown as MapInstance;
       const mapInstance = map.getMapInstance();
       if (mapInstance && mapInstance.flyTo) {
         mapInstance.flyTo({
@@ -98,11 +141,16 @@ export function Map() {
           zoom: 17,
           essential: true,
           speed: 2,
-          curve: 1
+          curve: 1,
         });
       }
 
-      addLocationMarker(mapRef.current, location, place.name, '/assets/location-pin.svg');
+      addLocationMarker(
+        mapRef.current,
+        location,
+        place.name,
+        "/assets/location-pin.svg",
+      );
       setSelectedPlace(place);
     }
   };
@@ -114,7 +162,7 @@ export function Map() {
     }
 
     if (mapRef.current) {
-      const map = mapRef.current as any;
+      const map = mapRef.current as unknown as MapInstance;
       map.clearMarkers();
       map.clearRoute();
       map.clearPaths();
@@ -135,11 +183,16 @@ export function Map() {
       }
 
       const placeType = PLACE_CATEGORIES[category].id;
-      const places = await searchNearbyPlaces(location[1], location[0], placeType);
+
+      const places = await searchNearbyPlaces(
+        location[1],
+        location[0],
+        placeType,
+      );
       setNearbyPlaces(places);
 
       if (mapRef.current) {
-        const map = mapRef.current as any;
+        const map = mapRef.current as unknown as MapInstance;
         map.clearMarkers();
         const markerIcon = PLACE_CATEGORIES[category].markerIcon;
 
@@ -150,12 +203,12 @@ export function Map() {
             [30, 30],
             () => handleNearbyPlaceClick(place),
             10,
-            `<b>${place.name}</b>`
+            `<b>${place.name}</b>`,
           );
         });
       }
     } catch (error) {
-      console.error('Error fetching nearby places:', error);
+      console.error("Error fetching nearby places:", error);
     }
   };
 
@@ -165,23 +218,23 @@ export function Map() {
     setShowNearbyList(false);
 
     if (mapRef.current) {
-      const map = mapRef.current as any;
+      const map = mapRef.current as unknown as MapInstance;
       map.clearMarkers();
     }
   };
 
   const handleNearbyPlaceClick = (place: NearbyPlace) => {
     if (mapRef.current) {
-      const map = mapRef.current as any;
+      const map = mapRef.current as unknown as MapInstance;
 
       map.clearMarkers();
       map.addImageMarker(
         [place.longitude, place.latitude],
-        '/assets/location-pin.svg',
+        "/assets/location-pin.svg",
         [30, 30],
-        () => { },
+        () => {},
         10,
-        `<b>${place.name}</b>`
+        `<b>${place.name}</b>`,
       );
 
       const mapInstance = map.getMapInstance();
@@ -191,7 +244,7 @@ export function Map() {
           zoom: 17,
           essential: true,
           speed: 2,
-          curve: 1
+          curve: 1,
         });
       }
     }
@@ -207,9 +260,9 @@ export function Map() {
     setSelectedPlace(placeData);
   };
 
-  const handleExplorePlaceClick = (place: any) => {
+  const handleExplorePlaceClick = (place: Place) => {
     if (mapRef.current) {
-      const map = mapRef.current as any;
+      const map = mapRef.current as unknown as MapInstance;
 
       const mapInstance = map.getMapInstance();
       if (mapInstance && mapInstance.flyTo) {
@@ -218,7 +271,7 @@ export function Map() {
           zoom: 17,
           essential: true,
           speed: 2,
-          curve: 1
+          curve: 1,
         });
       }
 
@@ -226,14 +279,14 @@ export function Map() {
 
       map.addImageMarker(
         [place.longitude, place.latitude],
-        '/assets/location-pin.svg',
+        "/assets/location-pin.svg",
         [30, 30],
-        () => { },
+        () => {},
         10,
-        `<b>${place.name}</b>`
+        `<b>${place.name}</b>`,
       );
     } else {
-      console.error('error!');
+      console.error("error!");
     }
 
     const placeData: Place = {
@@ -242,7 +295,7 @@ export function Map() {
       longitude: place.longitude,
       City: place.City,
       Country: place.Country,
-      type: place.type || 'explore',
+      type: place.type || "explore",
     };
     setSelectedPlace(placeData);
   };
@@ -259,7 +312,10 @@ export function Map() {
       }
 
       const originLatLon: [number, number] = [origin[1], origin[0]];
-      const destination: [number, number] = [selectedPlace.latitude, selectedPlace.longitude];
+      const destination: [number, number] = [
+        selectedPlace.latitude,
+        selectedPlace.longitude,
+      ];
 
       const response = await getNavigation(originLatLon, destination);
 
@@ -268,11 +324,11 @@ export function Map() {
         const decodedCoordinates = decodePolyline(encodedShape, 6);
 
         const routeCoordinates: [number, number][] = decodedCoordinates.map(
-          ([lat, lon]) => [lon, lat]
+          ([lat, lon]) => [lon, lat],
         );
 
-        const map = mapRef.current as any;
-        map.addPath(routeCoordinates, '#ffa500', 5);
+        const map = mapRef.current as unknown as MapInstance;
+        map.addPath(routeCoordinates, "#ffa500", 5);
 
         map.clearMarkers();
 
@@ -288,11 +344,11 @@ export function Map() {
             map.clearMarkers();
             map.addImageMarker(
               position,
-              '/pin.svg',
+              "/pin.svg",
               [30, 30],
-              () => { },
+              () => {},
               10,
-              ''
+              "",
             );
           },
         });
@@ -300,8 +356,8 @@ export function Map() {
         animationCleanup.current = cleanup;
       }
     } catch (error) {
-      console.error('Navigation error:', error);
-      alert('Unable to get directions. Please try again.');
+      console.error("Navigation error:", error);
+      alert("Unable to get directions. Please try again.");
     }
   };
 
@@ -309,17 +365,18 @@ export function Map() {
     setMapStyle(styleUrl);
 
     if (mapRef.current) {
-      const map = mapRef.current as any;
+      const map = mapRef.current as unknown as MapInstance;
       const mapInstance = map.getMapInstance();
 
       if (mapInstance && mapInstance.setStyle) {
-        const actualStyleUrl = styleUrl === 'default'
-          ? 'https://tiles.gebeta.app/styles/standard/style.json'
-          : styleUrl;
+        const actualStyleUrl =
+          styleUrl === "default"
+            ? "https://tiles.gebeta.app/styles/standard/style.json"
+            : styleUrl;
 
         mapInstance.setStyle(actualStyleUrl);
       } else {
-        console.error('Map style not available');
+        console.error("Map style not available");
       }
     }
   };
@@ -356,7 +413,7 @@ export function Map() {
             </div>
 
             {selectedPlace && (
-              <div className="mt-2 pointer-events-auto">
+              <div className="absolute top-[72px] left-4 right-4 md:left-4 md:right-auto md:w-[440px] pointer-events-auto">
                 <PlaceModal
                   place={selectedPlace}
                   onClose={handleCloseModal}
@@ -366,7 +423,7 @@ export function Map() {
             )}
 
             {showNearbyList && nearbyPlaces.length > 0 && !selectedPlace && (
-              <div className="mt-2 pointer-events-auto">
+              <div className="absolute top-[72px] left-4 right-4 md:left-4 md:right-auto md:w-[440px] pointer-events-auto">
                 <NearbyPlacesList
                   places={nearbyPlaces}
                   isLoading={false}
@@ -388,7 +445,10 @@ export function Map() {
       </div>
 
       <LocationButton onClick={handleLocationClick} isLocating={isLocating} />
-      <MapStyleButton onStyleChange={handleStyleChange} currentStyle={mapStyle} />
+      <MapStyleButton
+        onStyleChange={handleStyleChange}
+        currentStyle={mapStyle}
+      />
 
       <div className="absolute top-4 right-4 z-[1000]">
         <AuthAvatar />
