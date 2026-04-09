@@ -5,10 +5,12 @@ import { LoginPage } from './pages/LoginPage';
 import { TermsPage } from './pages/TermsPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { DeleteAccountPage } from './pages/DeleteAccountPage';
+import { OpenInAppBanner } from './components/OpenInAppBanner';
 
 function App() {
   return (
     <BrowserRouter>
+      <OpenInAppBanner />
       <Routes>
         <Route path="/" element={<Map />} />
         <Route path="/signup" element={<SignupPage />} />
