@@ -52,20 +52,31 @@
 
         p {
             color: #666;
-            margin: 0;
+            margin: 0 0 20px 0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #0088cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 10px;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <div class="spinner"></div>
-        <h2>Redirecting to Telegram...</h2>
-        <p>Please wait</p>
+        <div class="spinner" id="spinner"></div>
+        <h2 id="title">Redirecting to Telegram...</h2>
+        <p id="message">Please wait</p>
+        <a href="#" id="appLink" class="button" style="display: none;">Open App</a>
     </div>
 
     <script>
-        // Check if we're receiving auth callback
         const hash = window.location.hash.substring(1);
         const params = new URLSearchParams(hash);
 
@@ -74,9 +85,9 @@
         const hashValue = params.get('hash');
 
         if (id && auth_date && hashValue) {
-            // We have auth data, redirect to app
-            document.querySelector('h2').textContent = 'Authentication Successful!';
-            document.querySelector('p').textContent = 'Opening app...';
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('title').textContent = 'Authentication Successful!';
+            document.getElementById('message').textContent = 'Opening app...';
 
             const deepLinkParams = new URLSearchParams({
                 id,
@@ -89,17 +100,24 @@
             });
 
             const deepLink = `trafficapp://telegram-auth?${deepLinkParams.toString()}`;
+            document.getElementById('appLink').href = deepLink;
+
             window.location.href = deepLink;
+
+            setTimeout(() => {
+                document.getElementById('appLink').style.display = 'inline-block';
+                document.getElementById('message').textContent = 'Tap the button to open the app';
+            }, 2000);
         } else {
-            // No auth data, redirect to Telegram OAuth
             const botId = '8598127900';
             const origin = encodeURIComponent(window.location.origin);
             const returnUrl = encodeURIComponent(window.location.href);
 
             const oauthUrl = `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${origin}&embed=1&request_access=write&return_to=${returnUrl}`;
 
-            // Redirect to Telegram OAuth
-            window.location.href = oauthUrl;
+            setTimeout(() => {
+                window.location.href = oauthUrl;
+            }, 500);
         }
     </script>
 </body>
