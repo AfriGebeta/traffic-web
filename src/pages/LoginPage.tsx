@@ -16,7 +16,7 @@ export function LoginPage() {
   const navigate = useNavigate();
 
   const apiBase = import.meta.env.VITE_API_URL;
-  const botUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME;
+  const botUsername = "GebetaTrafficBot";
 
   const handleSuccess = () => navigate("/");
   console.log({ apiBase, botUsername });
