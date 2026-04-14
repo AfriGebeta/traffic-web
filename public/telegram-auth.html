@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Authentication</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        #telegram-login-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .loading {
+            color: #667eea;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #fee;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <svg class="logo" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FFA500;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#FF6B00;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <path fill="url(#grad)" d="M120,20 L180,60 L180,140 L120,180 L60,140 L60,60 Z" />
+            <path fill="white" d="M120,80 L140,100 L120,120 L100,100 Z" />
+        </svg>
+
+        <h1>Telegram Authentication</h1>
+        <p>Login with your Telegram account to continue</p>
+
+        <div id="telegram-login-container"></div>
+        <div id="status" class="loading">Loading Telegram widget...</div>
+    </div>
+
+    <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="GebetaTrafficBot"
+        data-size="large" data-radius="10" data-onauth="onTelegramAuth(user)" data-request-access="write">
+        </script>
+
+    <script>
+        function onTelegramAuth(user) {
+            document.getElementById('status').textContent = 'Authentication successful! Redirecting...';
+            document.getElementById('status').style.color = '#27ae60';
+
+            // Send data back to React Native
+            if (window.ReactNativeWebView) {
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'telegram_auth',
+                    data: user
+                }));
+            } else {
+                // Fallback for web testing
+                console.log('Telegram auth data:', user);
+
+                // Redirect with query params
+                const params = new URLSearchParams({
+                    id: user.id,
+                    auth_date: user.auth_date,
+                    hash: user.hash,
+                    first_name: user.first_name || '',
+                    last_name: user.last_name || '',
+                    username: user.username || '',
+                    photo_url: user.photo_url || ''
+                });
+
+                window.location.href = `trafficapp://telegram-auth?${params.toString()}`;
+            }
+        }
+
+        // Handle errors
+        window.addEventListener('error', function (e) {
+            document.getElementById('status').innerHTML =
+                '<div class="error">Failed to load Telegram widget. Please check your internet connection.</div>';
+        });
+
+        // Remove loading message after widget loads
+        setTimeout(function () {
+            const widget = document.querySelector('iframe');
+            if (widget) {
+                document.getElementById('status').textContent = '';
+            }
+        }, 2000);
+    </script>
+</body>
+
+</html>
