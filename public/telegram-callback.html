@@ -105,17 +105,8 @@
 
         const deepLink = `trafficapp://telegram-auth?${deepLinkParams.toString()}`;
 
-        // Try to open the app
+        // Immediately redirect to app
         window.location.href = deepLink;
-
-        // Fallback: show message after 2 seconds
-        setTimeout(() => {
-            document.querySelector('.container').innerHTML = `
-                <h2>Authentication Successful!</h2>
-                <p>If the app didn't open automatically, please return to the app manually.</p>
-                <a href="${deepLink}">Click here to open the app</a>
-            `;
-        }, 2000);
     </script>
 </body>
 

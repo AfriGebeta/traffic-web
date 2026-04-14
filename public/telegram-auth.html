@@ -106,37 +106,29 @@
     </div>
 
     <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="GebetaTrafficBot"
-        data-size="large" data-radius="8" data-onauth="onTelegramAuth(user)" data-request-access="write">
+        data-size="large" data-radius="10" data-onauth="onTelegramAuth(user)" data-request-access="write">
         </script>
 
     <script>
         function onTelegramAuth(user) {
-            document.getElementById('status').textContent = 'Authentication successful! Redirecting...';
-            document.getElementById('status').className = 'loading success';
+            document.getElementById('status').textContent = 'Authentication successful! Opening app...';
+            document.getElementById('status').style.color = '#27ae60';
 
-            // Send data back to React Native
-            if (window.ReactNativeWebView) {
-                window.ReactNativeWebView.postMessage(JSON.stringify({
-                    type: 'telegram_auth',
-                    data: user
-                }));
-            } else {
-                // Fallback for web testing
-                console.log('Telegram auth data:', user);
+            // Build deep link with auth data
+            const params = new URLSearchParams({
+                id: user.id.toString(),
+                auth_date: user.auth_date.toString(),
+                hash: user.hash,
+                first_name: user.first_name || '',
+                last_name: user.last_name || '',
+                username: user.username || '',
+                photo_url: user.photo_url || ''
+            });
 
-                // Redirect with query params
-                const params = new URLSearchParams({
-                    id: user.id,
-                    auth_date: user.auth_date,
-                    hash: user.hash,
-                    first_name: user.first_name || '',
-                    last_name: user.last_name || '',
-                    username: user.username || '',
-                    photo_url: user.photo_url || ''
-                });
+            const deepLink = `trafficapp://telegram-auth?${params.toString()}`;
 
-                window.location.href = `trafficapp://telegram-auth?${params.toString()}`;
-            }
+            // Immediately redirect to app
+            window.location.href = deepLink;
         }
 
         // Handle errors
