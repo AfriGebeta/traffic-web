@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Authentication</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        #telegram-login-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            min-height: 50px;
+        }
+
+        .status {
+            color: #667eea;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .success {
+            color: #27ae60;
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Telegram Login</h1>
+        <p>Click the button below to authenticate</p>
+        <div id="telegram-login-container"></div>
+        <div id="status" class="status">Loading...</div>
+    </div>
+
+    <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="GebetaTrafficBot"
+        data-size="large" data-radius="10" data-onauth="onTelegramAuth(user)" data-request-access="write">
+        </script>
+
+    <script>
+        function onTelegramAuth(user) {
+            document.getElementById('telegram-login-container').style.display = 'none';
+            document.getElementById('status').textContent = 'Authentication successful!';
+            document.getElementById('status').className = 'success';
+
+            // Send data to React Native WebView
+            if (window.ReactNativeWebView) {
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'telegram_auth',
+                    data: user
+                }));
+            }
+        }
+
+        setTimeout(function () {
+            const widget = document.querySelector('iframe');
+            if (widget) {
+                document.getElementById('status').textContent = '';
+            }
+        }, 2000);
+    </script>
+</body>
+
+</html>
