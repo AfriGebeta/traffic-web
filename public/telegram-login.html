@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Login - GebetaMaps</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             display: flex;
@@ -13,45 +19,111 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background: linear-gradient(135deg, #da9f1f 0%, #da9f1f 100%);
+            padding: 1rem;
+            background: oklch(0.985 0 0);
         }
 
         .container {
             background: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 3rem 2rem;
+            border-radius: 0.625rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             text-align: center;
             max-width: 400px;
-            width: 90%;
+            width: 100%;
+            border: 1px solid oklch(0.922 0 0);
+        }
+
+        .logo-container {
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
         }
 
         h1 {
-            color: #333;
-            margin-bottom: 1rem;
+            color: oklch(0.145 0 0);
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
         }
 
-        p {
-            color: #666;
+        .subtitle {
+            color: oklch(0.556 0 0);
+            font-size: 0.875rem;
             margin-bottom: 2rem;
+            line-height: 1.5;
         }
 
         #telegram-login-GebetaTrafficBot {
             display: inline-block;
+            margin: 1rem 0;
         }
 
         .loading {
             display: none;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: oklch(0.97 0 0);
+            border-radius: 0.5rem;
+        }
+
+        .loading p {
+            color: oklch(0.145 0 0);
+            margin-bottom: 0.5rem;
+        }
+
+        .loading-text {
+            color: oklch(0.556 0 0);
+            font-size: 0.875rem;
+        }
+
+        .open-app-btn {
+            display: inline-block;
+            background: oklch(0.205 0 0);
+            color: oklch(0.985 0 0);
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background 0.2s ease;
             margin-top: 1rem;
-            color: #667eea;
+        }
+
+        .open-app-btn:hover {
+            background: oklch(0.145 0 0);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .logo {
+                width: 64px;
+                height: 64px;
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1> GebetaMaps</h1>
-        <p>Login with your Telegram account to continue</p>
+        <div class="logo-container">
+            <img src="/assets/gebetamaps.png" alt="GebetaMaps Logo" class="logo">
+        </div>
+
+        <h1>GebetaMaps</h1>
+        <p class="subtitle">Login with your Telegram account to continue</p>
 
         <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="GebetaTrafficBot"
             data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write">
@@ -96,12 +168,11 @@
             setTimeout(() => {
                 const deepLink = `trafficapp://telegram-auth?${params.toString()}`;
                 document.getElementById('loading').innerHTML = `
-                    <p style="color: #333; margin-bottom: 1rem;">App didn't open?</p>
-                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                    <p style="color: oklch(0.145 0 0); margin-bottom: 0.5rem; font-weight: 500;">App didn't open?</p>
+                    <p class="loading-text" style="color: oklch(0.556 0 0); font-size: 0.875rem; margin-bottom: 1rem;">
                         Make sure GebetaMaps app is installed and running.
                     </p>
-                    <a href="${intentUrl}" 
-                       style="display: inline-block; background: #da9f1f; color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-size: 1rem;">
+                    <a href="${intentUrl}" class="open-app-btn">
                         Open App
                     </a>
                 `;
