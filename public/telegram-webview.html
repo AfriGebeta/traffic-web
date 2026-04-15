@@ -56,6 +56,15 @@
             font-size: 16px;
             font-weight: bold;
         }
+
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            background: #fee;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -72,19 +81,59 @@
         </script>
 
     <script>
+        let authData = null;
+
         function onTelegramAuth(user) {
+            console.log('Telegram auth received:', user);
+            authData = user;
+
             document.getElementById('telegram-login-container').style.display = 'none';
-            document.getElementById('status').textContent = 'Authentication successful!';
+            document.getElementById('status').textContent = 'Authentication successful! Processing...';
             document.getElementById('status').className = 'success';
 
-            // Send data to React Native WebView
-            if (window.ReactNativeWebView) {
-                window.ReactNativeWebView.postMessage(JSON.stringify({
-                    type: 'telegram_auth',
-                    data: user
-                }));
+            // Send data to React Native WebView immediately
+            sendToApp(user);
+        }
+
+        function sendToApp(user) {
+            try {
+                if (window.ReactNativeWebView) {
+                    console.log('Sending message to React Native');
+                    const message = JSON.stringify({
+                        type: 'telegram_auth',
+                        data: user
+                    });
+                    console.log('Message:', message);
+                    window.ReactNativeWebView.postMessage(message);
+
+                    // Update status after sending
+                    setTimeout(() => {
+                        document.getElementById('status').textContent = 'Logging you in...';
+                    }, 500);
+                } else {
+                    console.error('ReactNativeWebView not found');
+                    document.getElementById('status').textContent = 'Error: Not in app WebView';
+                    document.getElementById('status').className = 'error';
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                document.getElementById('status').textContent = 'Error: ' + error.message;
+                document.getElementById('status').className = 'error';
             }
         }
+
+        // Intercept ALL clicks and check if we have auth data
+        document.addEventListener('click', function (e) {
+            console.log('Click detected');
+            // If we have auth data and user clicks anywhere, send it
+            if (authData) {
+                console.log('Auth data exists, sending to app');
+                e.preventDefault();
+                e.stopPropagation();
+                sendToApp(authData);
+                return false;
+            }
+        }, true);
 
         setTimeout(function () {
             const widget = document.querySelector('iframe');
@@ -92,6 +141,10 @@
                 document.getElementById('status').textContent = '';
             }
         }, 2000);
+
+        // Log when page loads
+        console.log('Telegram WebView page loaded');
+        console.log('ReactNativeWebView available:', !!window.ReactNativeWebView);
     </script>
 </body>
 
