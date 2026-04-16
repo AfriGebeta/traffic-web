@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { login } from '../services/login.service';
 import { colors } from '@/shared/theme/colors';
+import { TelegramLogin } from './telegram-login';
 
 interface LoginFormProps {
   onSuccess: () => void;
@@ -98,6 +99,7 @@ export function LoginForm({ onSuccess, className, ...props }: LoginFormProps & R
                   {isLoading ? 'Logging in...' : 'Login'}
                 </Button>
               </Field>
+              <TelegramLogin />
               <FieldDescription className="text-center">
                 Don&apos;t have an account?{' '}
                 <a href="#" onClick={(e) => { e.preventDefault(); navigate('/signup'); }}>
