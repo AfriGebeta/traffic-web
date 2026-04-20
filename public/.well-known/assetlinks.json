@@ -7,6 +7,7 @@
             "namespace": "android_app",
             "package_name": "com.anonymous.trafficapp",
             "sha256_cert_fingerprints": [
+                "05:29:F1:A6:CB:B1:F6:1B:7C:E3:24:2B:8E:15:18:A0:7E:95:1B:BA:63:BF:3D:CE:5F:46:B7:24:18:E2:65:2C",
                 "B6:38:E3:F2:B7:0A:B9:08:C7:B3:54:DD:B3:69:F9:0F:2A:1C:C7:AE:D8:20:9A:08:0F:86:0A:E7:55:E0:B5:73"
             ]
         }
