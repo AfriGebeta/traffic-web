@@ -10,6 +10,14 @@ import { getStoredUser, logout } from '../services/signup.service';
 import { colors } from '@/shared/theme/colors';
 import type { User as UserType } from '../types/signup.types';
 
+function cleanUndefined(value: string): string {
+    return value
+        .replace(/\bundefined\b/gi, "")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+
 export function AuthAvatar() {
     const [user, setUser] = useState<UserType | null>(null);
     const navigate = useNavigate();
@@ -43,7 +51,7 @@ export function AuthAvatar() {
                         <>
                             <div className="p-2 bg-gray-50 rounded-lg text-xs">
                                 <div className="text-xs text-gray-600">Name</div>
-                                <div className="font-medium text-gray-900">{user.name}</div>
+                                <div className="font-medium text-gray-900">{cleanUndefined(user.name)}</div>
                                 <div className="text-xs text-gray-600 mt-1">Points</div>
                                 <div className="font-medium text-gray-900">{user.points}</div>
                             </div>
