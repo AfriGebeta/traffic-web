@@ -43,6 +43,7 @@ export const TelegramLogin = () => {
             buttonSize="large"
             cornerRadius={5}
             showAvatar={false}
+            requestAccess="write"
             lang="en"
         />
     )
