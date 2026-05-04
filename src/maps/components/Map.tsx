@@ -232,7 +232,7 @@ export function Map() {
         [place.longitude, place.latitude],
         "/assets/location-pin.svg",
         [30, 30],
-        () => {},
+        () => { },
         10,
         `<b>${place.name}</b>`,
       );
@@ -281,7 +281,7 @@ export function Map() {
         [place.longitude, place.latitude],
         "/assets/location-pin.svg",
         [30, 30],
-        () => {},
+        () => { },
         10,
         `<b>${place.name}</b>`,
       );
@@ -328,9 +328,30 @@ export function Map() {
         );
 
         const map = mapRef.current as unknown as MapInstance;
+        map.clearMarkers();
         map.addPath(routeCoordinates, "#ffa500", 5);
 
-        map.clearMarkers();
+        const destinationMarkerPos: [number, number] = [
+          selectedPlace.longitude,
+          selectedPlace.latitude,
+        ];
+
+        map.addImageMarker(
+          origin,
+          "/assets/location-pin.svg",
+          [30, 30],
+          () => { },
+          10,
+          "Your Location",
+        );
+        map.addImageMarker(
+          destinationMarkerPos,
+          "/assets/location-pin-2.svg",
+          [30, 30],
+          () => { },
+          10,
+          `<b>${selectedPlace.name}</b>`,
+        );
 
         if (animationCleanup.current) {
           animationCleanup.current();
@@ -342,12 +363,30 @@ export function Map() {
           duration: 10000,
           onUpdate: (position) => {
             map.clearMarkers();
+
+            map.addImageMarker(
+              origin!,
+              "/assets/location-pin.svg",
+              [30, 30],
+              () => { },
+              10,
+              "Your Location",
+            );
+            map.addImageMarker(
+              destinationMarkerPos,
+              "/assets/location-pin-2.png",
+              [30, 30],
+              () => { },
+              10,
+              `<b>${selectedPlace.name}</b>`,
+            );
+
             map.addImageMarker(
               position,
               "/pin.svg",
               [30, 30],
-              () => {},
-              10,
+              () => { },
+              20,
               "",
             );
           },
