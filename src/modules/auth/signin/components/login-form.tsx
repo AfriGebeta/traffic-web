@@ -1,18 +1,17 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { login } from '../services/login.service';
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { colors } from '@/shared/theme/colors';
-import { TelegramLogin } from './telegram-login';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../services/login.service';
 
 interface LoginFormProps {
   onSuccess: () => void;
@@ -99,7 +98,6 @@ export function LoginForm({ onSuccess, className, ...props }: LoginFormProps & R
                   {isLoading ? 'Logging in...' : 'Login'}
                 </Button>
               </Field>
-              <TelegramLogin />
               <FieldDescription className="text-center">
                 Don&apos;t have an account?{' '}
                 <a href="#" onClick={(e) => { e.preventDefault(); navigate('/signup'); }}>

@@ -1,6 +1,3 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -10,8 +7,11 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { register } from "../services/signup.service";
+import { cn } from "@/lib/utils";
 import { colors } from "@/shared/theme/colors";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { register } from "../services/signup.service";
 
 interface SignupFormProps {
   onSuccess: () => void;

@@ -44,8 +44,6 @@ export function AuthAvatar() {
                             <div className="p-2 bg-gray-50 rounded-lg text-xs">
                                 <div className="text-xs text-gray-600">Name</div>
                                 <div className="font-medium text-gray-900">{user.name}</div>
-                                <div className="text-xs text-gray-600 mt-1">Phone</div>
-                                <div className="font-medium text-gray-900">{user.phoneNumber}</div>
                                 <div className="text-xs text-gray-600 mt-1">Points</div>
                                 <div className="font-medium text-gray-900">{user.points}</div>
                             </div>
@@ -69,14 +67,14 @@ export function AuthAvatar() {
                     ) : (
                         <>
                             <button
-                                onClick={() => navigate('/signup')}
+                                onClick={() => navigate('/onboard')}
                                 className="w-full p-2 rounded-lg hover:bg-gray-100 transition-colors text-sm text-left"
                             >
                                 <span>Sign Up</span>
                             </button>
 
                             <button
-                                onClick={() => navigate('/login')}
+                                onClick={() => navigate('/onboard')}
                                 className="w-full p-2 rounded-lg hover:bg-gray-100 transition-colors text-sm text-left"
                             >
                                 <span>Sign In</span>

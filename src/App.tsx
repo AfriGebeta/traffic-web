@@ -6,6 +6,7 @@ import { TermsPage } from './pages/TermsPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { DeleteAccountPage } from './pages/DeleteAccountPage';
 import { OpenInAppBanner } from './components/OpenInAppBanner';
+import { OnboardAuth } from './modules/auth/onboard/OnboardAuth';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <OpenInAppBanner />
       <Routes>
         <Route path="/" element={<Map />} />
+        <Route path="/onboard" element={<OnboardAuth />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/terms" element={<TermsPage />} />
