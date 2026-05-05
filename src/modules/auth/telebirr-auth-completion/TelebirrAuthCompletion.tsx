@@ -58,12 +58,6 @@ export default function AuthCompletion() {
                     searchPlaceholder="Search country"
                     placeholder="your phone number"
                     countryCodeEditable={false}
-                    isValid={(value, country) => {
-                        if (value.length <= country?.dialCode?.length) {
-                            return false;
-                        }
-                        return true;
-                    }}
                     containerStyle={{
                         width: '100%'
                     }}
