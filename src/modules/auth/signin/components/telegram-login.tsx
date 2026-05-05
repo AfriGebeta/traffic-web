@@ -20,7 +20,7 @@ export const TelegramLogin = () => {
 
     const checkPhoneNumberExists = async () => {
         await getMe().then(user => {
-            if (!user?.phoneNumber) {
+            if (!user?.phoneNumber || user?.phoneNumber.startsWith('telegram')) {
                 navigate("/telebirr-auth-completion");
             }
         }).catch(err => {
