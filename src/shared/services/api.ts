@@ -42,8 +42,8 @@ async function request<T>(
 }
 
 export const api = {
-    get: <T>(endpoint: string, params?: Record<string, string>) =>
-        request<T>(endpoint, { method: 'GET', params }),
+    get: <T>(endpoint: string, params?: Record<string, string>, headers?: Record<string, string>) =>
+        request<T>(endpoint, { method: 'GET', params, headers }),
 
     post: <T>(endpoint: string, data?: unknown) =>
         request<T>(endpoint, {
