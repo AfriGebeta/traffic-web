@@ -1,5 +1,6 @@
 import { LoginButton } from "@telegram-auth/react";
 import { useNavigate } from "react-router-dom";
+import { getMe } from "../../telebirr-auth-completion/services/user.service";
 
 type TelegramAuthPayload = {
     id: number;
@@ -16,6 +17,17 @@ export const TelegramLogin = () => {
 
     const apiBase = import.meta.env.VITE_API_URL;
     const botUsername = "GebetaTrafficBot";
+
+    const checkPhoneNumberExists = async () => {
+        await getMe().then(user => {
+            if (!user?.phoneNumber) {
+                navigate("/telebirr-auth-completion");
+            }
+        }).catch(err => {
+            console.error("Failed to fetch user profile:", err);
+            return;
+        });
+    }
 
     return (
         <LoginButton
@@ -37,8 +49,8 @@ export const TelegramLogin = () => {
                 localStorage.setItem('auth_token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
-                navigate("/telebirr-auth-completion");
-                console.log("Telegram Auth Payload:", payload);
+                await checkPhoneNumberExists();
+                navigate("/");
             }}
             buttonSize="large"
             cornerRadius={5}

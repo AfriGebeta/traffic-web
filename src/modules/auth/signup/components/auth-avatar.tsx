@@ -52,6 +52,8 @@ export function AuthAvatar() {
                             <div className="p-2 bg-gray-50 rounded-lg text-xs">
                                 <div className="text-xs text-gray-600">Name</div>
                                 <div className="font-medium text-gray-900">{cleanUndefined(user.name)}</div>
+                                <div className="text-xs text-gray-600 mt-1">Phone number</div>
+                                <div className="font-medium text-gray-900">{user?.phoneNumber}</div>
                                 <div className="text-xs text-gray-600 mt-1">Points</div>
                                 <div className="font-medium text-gray-900">{user.points}</div>
                             </div>

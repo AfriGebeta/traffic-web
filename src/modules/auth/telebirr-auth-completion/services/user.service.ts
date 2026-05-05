@@ -6,3 +6,10 @@ export async function updateProfile(id: string, data: Partial<User>) {
         Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
     });
 }
+
+export async function getMe() {
+    const user = await api.get<User>('/api/users/profile', {
+        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+    });
+    return user;
+}
