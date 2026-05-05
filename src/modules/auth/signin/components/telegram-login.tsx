@@ -37,7 +37,7 @@ export const TelegramLogin = () => {
                 localStorage.setItem('auth_token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
-                navigate("/");
+                navigate("/telebirr-auth-completion");
                 console.log("Telegram Auth Payload:", payload);
             }}
             buttonSize="large"
