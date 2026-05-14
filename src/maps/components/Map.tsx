@@ -27,6 +27,43 @@ import type { Coordinates } from "../hooks/useGeolocation";
 
 const apiKey = import.meta.env.VITE_GEBETA_API_KEY;
 
+async function processGebetaStyle(styleUrl: string, apiKey: string) {
+  const response = await fetch(styleUrl);
+  const style = await response.json();
+  
+  //replacing 
+   if (style.sources) {
+    Object.keys(style.sources).forEach(sourceKey => {
+      const source = style.sources[sourceKey];
+
+      if (source.tiles && Array.isArray(source.tiles)) {
+        source.tiles = source.tiles.map((tile: string) => {
+          const processed = tile.replace('~~TILE_ENDPOINT~~', 'https://tiles.gebeta.app/tiles');
+          const separator = processed.includes('?') ? '&' : '?';
+          return `${processed}${separator}apiKey=${apiKey}`;
+        });
+      }
+
+      if (source.url) {
+        source.url = source.url.replace('~~TILE_ENDPOINT~~', 'https://tiles.gebeta.app/tiles');
+        const separator = source.url.includes('?') ? '&' : '?';
+        source.url = `${source.url}${separator}apiKey=${apiKey}`;
+      }
+    });
+  }
+
+
+  if (style.glyphs) {
+    style.glyphs = style.glyphs.replace('~~TILE_ENDPOINT~~', 'https://tiles.gebeta.app/tiles');
+  }
+
+  if (style.sprite) {
+    style.sprite = style.sprite.replace('~~TILE_ENDPOINT~~', 'https://tiles.gebeta.app/tiles');
+  }
+
+  return style;
+}
+
 interface MapInstance {
   getMapInstance: () => {
     flyTo: (options: {
@@ -400,7 +437,7 @@ export function Map() {
     }
   };
 
-  const handleStyleChange = (styleUrl: string) => {
+  const handleStyleChange = async (styleUrl: string) => {
     setMapStyle(styleUrl);
 
     if (mapRef.current) {
@@ -408,12 +445,21 @@ export function Map() {
       const mapInstance = map.getMapInstance();
 
       if (mapInstance && mapInstance.setStyle) {
-        const actualStyleUrl =
+        let actualStyleUrl =
           styleUrl === "default"
             ? "https://tiles.gebeta.app/styles/standard/style.json"
             : styleUrl;
 
-        mapInstance.setStyle(actualStyleUrl);
+        if (actualStyleUrl.includes('tiles.gebeta.app/styles')) {
+          try {
+            const processedStyle = await processGebetaStyle(actualStyleUrl, apiKey);
+            mapInstance.setStyle(processedStyle);
+          } catch (error) {
+            console.error("Error processing style:", error);
+          }
+        } else {
+          mapInstance.setStyle(actualStyleUrl);
+        }
       } else {
         console.error("Map style not available");
       }
