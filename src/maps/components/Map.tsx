@@ -27,12 +27,35 @@ import type { Coordinates } from "../hooks/useGeolocation";
 
 const apiKey = import.meta.env.VITE_GEBETA_API_KEY;
 
+function getRasterStyle(apiKey: string) {
+  return {
+    version: 8,
+    name: 'Satellite',
+    sources: {
+      'satellite': {
+        type: 'raster',
+        tiles: [`https://tiles.gebeta.app/tiles/raster/{z}/{x}/{y}.png?apiKey=${apiKey}`],
+        tileSize: 256,
+        minzoom: 0,
+        maxzoom: 16,
+      },
+    },
+    layers: [
+      {
+        id: 'satellite-layer',
+        type: 'raster',
+        source: 'satellite',
+      },
+    ],
+  };
+}
+
 async function processGebetaStyle(styleUrl: string, apiKey: string) {
   const response = await fetch(styleUrl);
   const style = await response.json();
-  
+
   //replacing 
-   if (style.sources) {
+  if (style.sources) {
     Object.keys(style.sources).forEach(sourceKey => {
       const source = style.sources[sourceKey];
 
@@ -73,7 +96,7 @@ interface MapInstance {
       speed: number;
       curve: number;
     }) => void;
-    setStyle: (styleUrl: string) => void;
+    setStyle: (styleUrl: string | Record<string, unknown>) => void;
   };
   clearMarkers: () => void;
   clearRoute: () => void;
@@ -445,11 +468,19 @@ export function Map() {
       const mapInstance = map.getMapInstance();
 
       if (mapInstance && mapInstance.setStyle) {
+        // Handle raster/satellite style
+        if (styleUrl === 'raster') {
+          const rasterStyle = getRasterStyle(apiKey);
+          mapInstance.setStyle(rasterStyle);
+          return;
+        }
+
         let actualStyleUrl =
           styleUrl === "default"
             ? "https://tiles.gebeta.app/styles/standard/style.json"
             : styleUrl;
 
+        // Check if it's a Gebeta style URL that needs processing
         if (actualStyleUrl.includes('tiles.gebeta.app/styles')) {
           try {
             const processedStyle = await processGebetaStyle(actualStyleUrl, apiKey);
