@@ -1,17 +1,15 @@
 import { api } from '@/shared/services/api';
-import type { NavigationResponse } from './types';
+import type { NavigationRequest, NavigationResponse } from './types';
 
 export async function getNavigation(
   origin: [number, number],
-  destination: [number, number]
+  destination: [number, number],
+  waypoints: [number, number][] = []
 ): Promise<NavigationResponse> {
-  const response = await api.post<NavigationResponse>(
-    '/api/navigation/request-navigation',
-    {
-      origin,
-      destination,
-    }
-  );
+  const body: NavigationRequest = { origin, destination };
+  if (waypoints.length > 0) {
+    body.waypoints = waypoints;
+  }
 
-  return response;
+  return api.post<NavigationResponse>('/api/navigation/request-navigation', body);
 }
