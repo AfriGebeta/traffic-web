@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { Compass, Plus } from 'lucide-react';
 import { colors } from '@/shared/theme/colors';
 import { ContributeForm } from '@/modules/places/components/ContributeForm';
+import { ContributeIncidentForm } from '@/modules/incidents/components/ContributeIncidentForm';
+import { ContributeChoiceModal } from '@/shared/components/ContributeChoiceModal';
 import { ExploreDrawer } from '@/modules/explore/components/ExploreDrawer';
+
+type ContributeView = 'choice' | 'place' | 'incident' | null;
 
 interface BottomSheetProps {
     userLocation: [number, number] | null;
@@ -10,13 +14,24 @@ interface BottomSheetProps {
 }
 
 export function BottomSheet({ userLocation, onExplorePlaceClick }: BottomSheetProps) {
-    const [showContributeForm, setShowContributeForm] = useState(false);
+    const [contributeView, setContributeView] = useState<ContributeView>(null);
     const [showExploreDrawer, setShowExploreDrawer] = useState(false);
     const [exploreLocation, setExploreLocation] = useState<{ lat: number; lng: number } | null>(null);
 
-    const handleContributeSuccess = () => {
-        setShowContributeForm(false);
+    const initialCoordinates = userLocation
+        ? { lng: userLocation[0], lat: userLocation[1] }
+        : undefined;
+
+    const closeContribute = () => setContributeView(null);
+
+    const handlePlaceSuccess = () => {
+        closeContribute();
         alert('Place submitted successfully!');
+    };
+
+    const handleIncidentSuccess = () => {
+        closeContribute();
+        alert('Incident reported successfully!');
     };
 
     const handleExploreClick = () => {
@@ -66,7 +81,7 @@ export function BottomSheet({ userLocation, onExplorePlaceClick }: BottomSheetPr
                         </button>
 
                         <button
-                            onClick={() => setShowContributeForm(true)}
+                            onClick={() => setContributeView('choice')}
                             className="flex flex-col items-center gap-1 transition-all"
                         >
                             <div
@@ -81,10 +96,27 @@ export function BottomSheet({ userLocation, onExplorePlaceClick }: BottomSheetPr
                 </div>
             </div>
 
-            {showContributeForm && (
+            {contributeView === 'choice' && (
+                <ContributeChoiceModal
+                    onClose={closeContribute}
+                    onSelectPlace={() => setContributeView('place')}
+                    onSelectIncident={() => setContributeView('incident')}
+                />
+            )}
+
+            {contributeView === 'place' && (
                 <ContributeForm
-                    onClose={() => setShowContributeForm(false)}
-                    onSuccess={handleContributeSuccess}
+                    onClose={closeContribute}
+                    onSuccess={handlePlaceSuccess}
+                    initialCoordinates={initialCoordinates}
+                />
+            )}
+
+            {contributeView === 'incident' && (
+                <ContributeIncidentForm
+                    onClose={closeContribute}
+                    onSuccess={handleIncidentSuccess}
+                    initialCoordinates={initialCoordinates}
                 />
             )}
 
