@@ -1,6 +1,6 @@
 import { LoginButton } from "@telegram-auth/react";
 import { useNavigate } from "react-router-dom";
-import { getMe } from "../../telebirr-auth-completion/services/user.service";
+import { getMe } from "../../Telegram-auth-completion/services/user.service";
 
 type TelegramAuthPayload = {
     id: number;
@@ -21,7 +21,7 @@ export const TelegramLogin = () => {
     const checkPhoneNumberExists = async () => {
         await getMe().then(user => {
             if (!user?.phoneNumber || user?.phoneNumber.startsWith('telegram')) {
-                navigate("/telebirr-auth-completion");
+                navigate("/Telegram-auth-completion");
             }
         }).catch(err => {
             console.error("Failed to fetch user profile:", err);

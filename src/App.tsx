@@ -7,7 +7,7 @@ import { PrivacyPage } from './pages/PrivacyPage';
 import { DeleteAccountPage } from './pages/DeleteAccountPage';
 import { OpenInAppBanner } from './components/OpenInAppBanner';
 import { OnboardAuth } from './modules/auth/onboard/OnboardAuth';
-import TelebirrAuthCompletion from './modules/auth/telebirr-auth-completion/TelebirrAuthCompletion';
+import TelegramAuthCompletion from './modules/auth/telegram-auth-completion/TelegramAuthCompletion';
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
         <Route path="/onboard" element={<OnboardAuth />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/telebirr-auth-completion" element={<TelebirrAuthCompletion />} />
+        <Route path="/telegram-auth-completion" element={<TelegramAuthCompletion />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/delete-account" element={<DeleteAccountPage />} />
