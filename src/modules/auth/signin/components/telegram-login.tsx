@@ -1,63 +1,77 @@
-import { LoginButton } from "@telegram-auth/react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMe } from "../../telegram-auth-completion/services/user.service";
 
-type TelegramAuthPayload = {
-    id: number;
-    first_name?: string;
-    last_name?: string;
-    username?: string;
-    photo_url?: string;
-    auth_date: number;
-    hash: string;
-};
+declare global {
+    interface Window {
+        onTelegramAuth: (user: any) => void;
+    }
+}
 
 export const TelegramLogin = () => {
     const navigate = useNavigate();
+    const telegramRef = useRef<HTMLDivElement>(null);
 
-    const apiBase = import.meta.env.VITE_API_URL;
-    const botUsername = "GebetaTrafficBot";
+    useEffect(() => {
+        const checkPhoneNumberExists = async () => {
+            try {
+                const user = await getMe();
 
-    const checkPhoneNumberExists = async () => {
-        await getMe().then(user => {
-            if (!user?.phoneNumber || user?.phoneNumber.startsWith('telegram')) {
-                navigate("/Telegram-auth-completion");
+                if (
+                    !user?.phoneNumber ||
+                    user.phoneNumber.startsWith("telegram")
+                ) {
+                    navigate("/Telegram-auth-completion");
+                }
+            } catch (err) {
+                console.error("Failed to fetch user profile:", err);
             }
-        }).catch(err => {
-            console.error("Failed to fetch user profile:", err);
-            return;
-        });
-    }
+        };
+
+        checkPhoneNumberExists();
+
+        window.onTelegramAuth = (user) => {
+            console.log("Telegram User:", user);
+
+            // send to backend here
+        };
+
+        if (!telegramRef.current) return;
+
+        telegramRef.current.innerHTML = "";
+
+        const script = document.createElement("script");
+
+        script.src =
+            "https://telegram.org/js/telegram-widget.js?22";
+
+        script.async = true;
+
+        script.setAttribute(
+            "data-telegram-login",
+            "GebetaTrafficBot"
+        );
+
+        script.setAttribute("data-size", "large");
+
+        script.setAttribute("data-userpic", "false");
+
+        script.setAttribute(
+            "data-request-access",
+            "write"
+        );
+
+        script.setAttribute(
+            "data-onauth",
+            "onTelegramAuth(user)"
+        );
+
+        telegramRef.current.appendChild(script);
+    }, [navigate]);
 
     return (
-        <LoginButton
-            botUsername={botUsername}
-            onAuthCallback={async (payload: TelegramAuthPayload) => {
-                console.log({ payload })
-                const res = await fetch(`${apiBase}/api/users/telegram/login`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
-                });
-
-                const data = await res.json();
-                if (!res.ok) {
-                    alert(data.error || "Telegram login failed");
-                    return;
-                }
-
-                localStorage.setItem('auth_token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-
-                await checkPhoneNumberExists();
-                navigate("/");
-            }}
-            buttonSize="large"
-            cornerRadius={5}
-            showAvatar={false}
-            //@ts-ignore
-            requestAccess="write phone"
-            lang="en"
-        />
-    )
-}
+        <div className="flex justify-center items-center min-h-screen">
+            <div ref={telegramRef} />
+        </div>
+    );
+};

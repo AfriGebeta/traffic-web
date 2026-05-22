@@ -8,23 +8,26 @@ import { DeleteAccountPage } from './pages/DeleteAccountPage';
 import { OpenInAppBanner } from './components/OpenInAppBanner';
 import { OnboardAuth } from './modules/auth/onboard/OnboardAuth';
 import TelegramAuthCompletion from './modules/auth/telegram-auth-completion/TelegramAuthCompletion';
+import { HelmetProvider } from 'react-helmet-async';
 
 function App() {
   return (
-    <BrowserRouter>
-      <OpenInAppBanner />
-      <Routes>
-        <Route path="/" element={<Map />} />
-        <Route path="/onboard" element={<OnboardAuth />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/telegram-auth-completion" element={<TelegramAuthCompletion />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
-        <Route path="/delete-account" element={<DeleteAccountPage />} />
-        <Route path="*" element={<div>404 Not Found</div>} />
-      </Routes>
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <OpenInAppBanner />
+        <Routes>
+          <Route path="/" element={<Map />} />
+          <Route path="/onboard" element={<OnboardAuth />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/telegram-auth-completion" element={<TelegramAuthCompletion />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/delete-account" element={<DeleteAccountPage />} />
+          <Route path="*" element={<div>404 Not Found</div>} />
+        </Routes>
+      </BrowserRouter>
+    </HelmetProvider>
   );
 }
 
