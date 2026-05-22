@@ -1,6 +1,6 @@
 import { LoginButton } from "@telegram-auth/react";
 import { useNavigate } from "react-router-dom";
-import { getMe } from "../../Telegram-auth-completion/services/user.service";
+import { getMe } from "../../telegram-auth-completion/services/user.service";
 
 type TelegramAuthPayload = {
     id: number;
