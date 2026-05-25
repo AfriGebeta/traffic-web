@@ -5,7 +5,7 @@ import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { Button } from '@/components/ui/button';
 import { colors } from '@/shared/theme/colors';
-import { updateProfile } from '@/modules/auth/telebirr-auth-completion/services/user.service';
+import { updateProfile } from '@/modules/auth/telegram-auth-completion/services/user.service';
 import { getStoredUser } from '@/modules/auth/signup/services/signup.service';
 import type { User as UserType } from '@/modules/auth/signup/types/signup.types';
 
