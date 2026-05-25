@@ -140,7 +140,7 @@ export const TelegramLogin = () => {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center min-h-screen gap-4">
+        <div className="flex flex-col justify-center items-center gap-4">
             <button
                 onClick={handleTelegramLogin}
                 disabled={loading}
