@@ -2,6 +2,7 @@ export interface User {
   id: string;
   phoneNumber: string;
   name: string;
+  username: string;
   points: number;
   createdAt: string;
   updatedAt: string;

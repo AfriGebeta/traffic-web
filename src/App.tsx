@@ -5,6 +5,7 @@ import { LoginPage } from './pages/LoginPage';
 import { TermsPage } from './pages/TermsPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { DeleteAccountPage } from './pages/DeleteAccountPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { OpenInAppBanner } from './components/OpenInAppBanner';
 import { OnboardAuth } from './modules/auth/onboard/OnboardAuth';
 import TelegramAuthCompletion from './modules/auth/telegram-auth-completion/TelegramAuthCompletion';
@@ -21,6 +22,7 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/telegram-auth-completion" element={<TelegramAuthCompletion />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/delete-account" element={<DeleteAccountPage />} />
