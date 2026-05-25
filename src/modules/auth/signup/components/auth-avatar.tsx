@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Download } from 'lucide-react';
+import { User, Download, Pencil } from 'lucide-react';
 import {
     Popover,
     PopoverContent,
@@ -57,6 +57,14 @@ export function AuthAvatar() {
                                 <div className="text-xs text-gray-600 mt-1">Points</div>
                                 <div className="font-medium text-gray-900">{user.points}</div>
                             </div>
+
+                            <button
+                                onClick={() => navigate('/profile')}
+                                className="w-full py-1.5 px-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm text-left flex items-center gap-2"
+                            >
+                                <Pencil size={16} />
+                                <span>Edit Profile</span>
+                            </button>
 
                             <button
                                 onClick={() => alert('App coming soon!')}
