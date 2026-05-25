@@ -2,74 +2,65 @@ import { useState } from 'react';
 import { X, Upload, MapPin, CheckCircle } from 'lucide-react';
 import GebetaMap from '@gebeta/tiles';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field';
 import { colors } from '@/shared/theme/colors';
-import type { PlaceType } from '../types/place.types';
-import { useImageUpload } from '../hooks/useImageUpload';
-import { useMapMarker } from '../hooks/useMapMarker';
-import { usePlaceContribution } from '../hooks/usePlaceContribution';
+import { useImageUpload } from '@/modules/places/hooks/useImageUpload';
+import { useMapMarker } from '@/modules/places/hooks/useMapMarker';
+import { useIncidentContribution } from '../hooks/useIncidentContribution';
+import { useIncidentTypes } from '../hooks/useIncidentTypes';
 
-interface ContributeFormProps {
+interface ContributeIncidentFormProps {
     onClose: () => void;
     onSuccess: () => void;
     initialCoordinates?: { lat: number; lng: number };
 }
 
-const PLACE_TYPES: { value: PlaceType; label: string }[] = [
-    { value: 'gas_station', label: 'Gas Station' },
-    { value: 'taxi_station', label: 'Taxi Station' },
-    { value: 'repair_shop', label: 'Repair Shop' },
-    { value: 'restaurant', label: 'Restaurant' },
-    { value: 'parking', label: 'Parking' },
-    { value: 'hospital', label: 'Hospital' },
-    { value: 'other', label: 'Other' },
-];
-
 const apiKey = import.meta.env.VITE_GEBETA_API_KEY;
 
-export function ContributeForm({ onClose, onSuccess, initialCoordinates }: ContributeFormProps) {
-    const [name, setName] = useState('');
-    const [type, setType] = useState<PlaceType | ''>('');
+export function ContributeIncidentForm({ onClose, onSuccess, initialCoordinates }: ContributeIncidentFormProps) {
+    const [typeId, setTypeId] = useState('');
     const [otherLabel, setOtherLabel] = useState('');
     const [description, setDescription] = useState('');
 
+    const { types, loading: typesLoading, error: typesError } = useIncidentTypes();
     const { mapRef, coordinates, confirmed, confirmCenter, resetLocation } = useMapMarker(initialCoordinates);
-    const { images, uploading, error: uploadError, handleUpload, removeImage } = useImageUpload();
-    const { submitting, error: submitError, submitPlace, setError } = usePlaceContribution();
+    const { images, uploading, error: uploadError, handleUpload, removeImage } = useImageUpload('incidents');
+    const { submitting, error: submitError, submitIncident, setError } = useIncidentContribution();
 
-    const error = uploadError || submitError;
+    const error = typesError || uploadError || submitError;
+    const selectedTypeId = typeId || types[0]?.id || '';
+    const selectedType = types.find(t => t.id === selectedTypeId);
+    const isOther = selectedType?.label?.toLowerCase() === 'other' || selectedType?.name?.toLowerCase() === 'other';
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        if (!type) {
-            setError('Please select a place type');
-            return;
-        }
-
-        if (type === 'other' && !otherLabel.trim()) {
-            setError('Please specify the type of place');
-            return;
-        }
 
         if (!coordinates || !confirmed) {
             setError('Please confirm a location on the map');
             return;
         }
 
-        const fullDescription = type === 'other' && otherLabel.trim()
+        if (!selectedTypeId) {
+            setError('Please select an incident type');
+            return;
+        }
+
+        if (isOther && !otherLabel.trim()) {
+            setError('Please describe the type of incident');
+            return;
+        }
+
+        const fullDescription = isOther && otherLabel.trim()
             ? `[${otherLabel.trim()}] ${description}`.trim()
             : description;
 
-        await submitPlace(
+        await submitIncident(
             {
-                name,
-                type,
                 lat: coordinates.lat,
                 lng: coordinates.lng,
+                typeId: selectedTypeId,
                 description: fullDescription,
-                images,
+                image: images,
             },
             onSuccess
         );
@@ -83,7 +74,7 @@ export function ContributeForm({ onClose, onSuccess, initialCoordinates }: Contr
         <div className="fixed inset-0 bg-white bg-opacity-95 backdrop-blur-sm flex items-center justify-center z-[2000] p-4">
             <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-100">
                 <div className="sticky top-0 bg-white border-b border-gray-100 p-6 flex items-center justify-between">
-                    <h2 className="text-2xl font-semibold text-gray-800">Contribute a Place</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800">Report an Incident</h2>
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -97,61 +88,53 @@ export function ContributeForm({ onClose, onSuccess, initialCoordinates }: Contr
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-4">
                                 <Field>
-                                    <FieldLabel htmlFor="name">Place Name</FieldLabel>
-                                    <Input
-                                        id="name"
-                                        type="text"
-                                        placeholder="Shell Gas Station"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        required
-                                        className="focus:!border-[#fde2aeff] focus:!shadow-[0_1px_3px_0_#fde2aeff] focus-visible:!ring-0"
-                                    />
-                                </Field>
-
-                                <Field>
-                                    <FieldLabel htmlFor="type">Place Type</FieldLabel>
+                                    <FieldLabel htmlFor="type">Incident Type</FieldLabel>
                                     <select
                                         id="type"
-                                        value={type}
+                                        value={selectedTypeId}
                                         onChange={(e) => {
-                                            setType(e.target.value as PlaceType);
+                                            setTypeId(e.target.value);
                                             setOtherLabel('');
                                         }}
+                                        disabled={typesLoading || types.length === 0}
                                         required
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-[#fde2aeff] focus:shadow-[0_1px_3px_0_#fde2aeff]"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-[#fde2aeff] focus:shadow-[0_1px_3px_0_#fde2aeff] disabled:bg-gray-50"
                                     >
-                                        <option value="" disabled>Select a type…</option>
-                                        {PLACE_TYPES.map(pt => (
-                                            <option key={pt.value} value={pt.value}>{pt.label}</option>
+                                        {typesLoading && <option value="">Loading types...</option>}
+                                        {!typesLoading && types.length === 0 && (
+                                            <option value="">No types available</option>
+                                        )}
+                                        {types.map((t) => (
+                                            <option key={t.id} value={t.id}>{t.label}</option>
                                         ))}
                                     </select>
                                 </Field>
 
-                                {type === 'other' && (
+                                {isOther && (
                                     <Field>
-                                        <FieldLabel htmlFor="otherLabel">Specify Place Type</FieldLabel>
+                                        <FieldLabel htmlFor="otherLabel">Specify Incident Type</FieldLabel>
                                         <input
                                             id="otherLabel"
                                             type="text"
-                                            placeholder="e.g. Car wash, Pharmacy…"
+                                            placeholder="e.g. Road flooding, fallen tree…"
                                             value={otherLabel}
                                             onChange={(e) => setOtherLabel(e.target.value)}
                                             required
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-[#fde2aeff] focus:shadow-[0_1px_3px_0_#fde2aeff]"
                                         />
-                                        <FieldDescription>Tell us what kind of place this is</FieldDescription>
+                                        <FieldDescription>Tell us what kind of incident this is</FieldDescription>
                                     </Field>
                                 )}
 
                                 <Field>
-                                    <FieldLabel htmlFor="description">Description (optional)</FieldLabel>
+                                    <FieldLabel htmlFor="description">Description</FieldLabel>
                                     <textarea
                                         id="description"
-                                        placeholder="24/7 gas station with convenience store"
+                                        placeholder="Car accident on Bole Road"
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
                                         rows={4}
+                                        required
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-[#fde2aeff] focus:shadow-[0_1px_3px_0_#fde2aeff]"
                                     />
                                 </Field>
@@ -194,7 +177,7 @@ export function ContributeForm({ onClose, onSuccess, initialCoordinates }: Contr
                                             </div>
                                         )}
                                     </div>
-                                    <FieldDescription>Upload photos of the place (optional)</FieldDescription>
+                                    <FieldDescription>Upload photos of the incident (optional)</FieldDescription>
                                 </Field>
                             </div>
 
@@ -275,11 +258,11 @@ export function ContributeForm({ onClose, onSuccess, initialCoordinates }: Contr
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={submitting || uploading || !confirmed}
+                                disabled={submitting || uploading || !confirmed || typesLoading || types.length === 0}
                                 style={{ backgroundColor: colors.primary.main }}
                                 className="flex-1 text-white disabled:opacity-50"
                             >
-                                {submitting ? 'Submitting...' : 'Submit Place'}
+                                {submitting ? 'Submitting...' : 'Report Incident'}
                             </Button>
                         </div>
                     </form>

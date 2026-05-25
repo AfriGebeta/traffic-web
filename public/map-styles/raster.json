@@ -16,7 +16,6 @@
       "url": "https://tiles.gebeta.app/styles/vector-components-config/tiles.json"
     }
   },
-
   "glyphs": "https://tiles.gebeta.app/fonts/{fontstack}/{range}.pbf",
   "layers": [
     {
@@ -596,9 +595,7 @@
         "icon-size": 1,
         "text-field": "{ref}"
       },
-      "paint": {
-
-      }
+      "paint": {}
     },
     {
       "id": "highway-shield-us-interstate",
@@ -1274,7 +1271,5 @@
         "text-halo-color": "rgba(255,255,255,0.8)"
       }
     }
-
   ]
 }
-

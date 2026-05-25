@@ -1,13 +1,10 @@
-import { useNavigate } from 'react-router-dom';
-import { LoginForm } from '@/modules/auth/signin/components/login-form';
+import { LoginForm } from "@/modules/auth/signin/components/login-form";
+import { useNavigate } from "react-router-dom";
 
 export function LoginPage() {
   const navigate = useNavigate();
 
-  const handleSuccess = () => {
-    navigate('/');
-  };
-
+  const handleSuccess = () => navigate("/");
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-4xl">

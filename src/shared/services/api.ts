@@ -42,8 +42,8 @@ async function request<T>(
 }
 
 export const api = {
-    get: <T>(endpoint: string, params?: Record<string, string>) =>
-        request<T>(endpoint, { method: 'GET', params }),
+    get: <T>(endpoint: string, params?: Record<string, string>, headers?: Record<string, string>) =>
+        request<T>(endpoint, { method: 'GET', params, headers }),
 
     post: <T>(endpoint: string, data?: unknown) =>
         request<T>(endpoint, {
@@ -56,7 +56,15 @@ export const api = {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
-
+    patch: <T>(endpoint: string, data?: unknown, headers?: Record<string, string>) =>
+        request<T>(endpoint, {
+            method: 'PATCH',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json',
+                ...headers,
+            },
+        }),
     delete: <T>(endpoint: string) =>
         request<T>(endpoint, { method: 'DELETE' }),
 };

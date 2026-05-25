@@ -8,9 +8,9 @@ interface MapStyleButtonProps {
 
 const MAP_STYLES = [
   { name: 'Default', value: 'default', image: '/assets/default.JPG' },
-  { name: 'Custom', value: '/map-styles/custom.json', image: '/assets/custom.JPG' },
-  { name: 'Dark', value: '/map-styles/dark-custom.json', image: '/assets/dark.JPG' },
-  { name: 'Satellite', value: '/map-styles/raster.json', image: '/assets/raster.JPG' },
+  { name: 'Custom', value: 'https://tiles.gebeta.app/styles/standard/light.json', image: '/assets/custom.JPG' },
+  { name: 'Dark', value: 'https://tiles.gebeta.app/styles/standard/dark.json', image: '/assets/dark.JPG' },
+  { name: 'Satellite', value: 'https://tiles.gebeta.app/styles/raster/raster.json', image: '/assets/raster.JPG' },
 ];
 
 export function MapStyleButton({ onStyleChange, currentStyle }: MapStyleButtonProps) {

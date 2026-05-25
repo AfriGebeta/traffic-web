@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { uploadToMinio } from '../utils/minio';
 
-export function useImageUpload() {
+export function useImageUpload(uploadPrefix: string = 'places') {
     const [images, setImages] = useState<string[]>([]);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
@@ -13,7 +13,7 @@ export function useImageUpload() {
         setError('');
 
         try {
-            const uploadPromises = Array.from(files).map(file => uploadToMinio(file, 'places'));
+            const uploadPromises = Array.from(files).map(file => uploadToMinio(file, uploadPrefix));
             const objectNames = await Promise.all(uploadPromises);
             setImages(prev => [...prev, ...objectNames]);
         } catch (err) {
