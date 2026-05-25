@@ -64,7 +64,7 @@ export const TelegramLogin = () => {
     };
 
     useEffect(() => {
-        checkPhoneNumberExists();
+        // checkPhoneNumberExists();
 
         if (document.getElementById("telegram-login-sdk")) {
             sdkReady.current = true;
@@ -89,16 +89,11 @@ export const TelegramLogin = () => {
         setLoading(true);
         setError(null);
 
-        console.log("redirect_uri being sent before:", window.location.href);
-
         window.history.replaceState(
             {},
             "",
             window.location.pathname
         );
-
-        console.log("redirect_uri being sent after:", window.location.href);
-
 
         window.Telegram.Login.auth(
             {
