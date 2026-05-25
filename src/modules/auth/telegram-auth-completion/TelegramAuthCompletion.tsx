@@ -42,7 +42,7 @@ export default function AuthCompletion() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
-            <h2 className="text-2xl font-bold mb-6 whitespace-nowrap text-center">Complete Your Telebirr Authentication</h2>
+            <h2 className="text-2xl font-bold mb-6 whitespace-nowrap text-center">Complete Your Telegram Authentication</h2>
             <form onSubmit={handleSubmit} className="w-full max-w-sm mx-auto flex flex-col gap-4">
                 <PhoneInput
                     country={'et'}
