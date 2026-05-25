@@ -89,6 +89,17 @@ export const TelegramLogin = () => {
         setLoading(true);
         setError(null);
 
+        console.log("redirect_uri being sent before:", window.location.href);
+
+        window.history.replaceState(
+            {},
+            "",
+            window.location.pathname
+        );
+
+        console.log("redirect_uri being sent after:", window.location.href);
+
+
         window.Telegram.Login.auth(
             {
                 client_id: TELEGRAM_CLIENT_ID,
