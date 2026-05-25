@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Upload, MapPin } from 'lucide-react';
+import { X, Upload, MapPin, CheckCircle } from 'lucide-react';
 import GebetaMap from '@gebeta/tiles';
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field';
@@ -19,21 +19,24 @@ const apiKey = import.meta.env.VITE_GEBETA_API_KEY;
 
 export function ContributeIncidentForm({ onClose, onSuccess, initialCoordinates }: ContributeIncidentFormProps) {
     const [typeId, setTypeId] = useState('');
+    const [otherLabel, setOtherLabel] = useState('');
     const [description, setDescription] = useState('');
 
     const { types, loading: typesLoading, error: typesError } = useIncidentTypes();
-    const { mapRef, coordinates, handleMapClick } = useMapMarker(initialCoordinates);
+    const { mapRef, coordinates, confirmed, confirmCenter, resetLocation } = useMapMarker(initialCoordinates);
     const { images, uploading, error: uploadError, handleUpload, removeImage } = useImageUpload('incidents');
     const { submitting, error: submitError, submitIncident, setError } = useIncidentContribution();
 
     const error = typesError || uploadError || submitError;
     const selectedTypeId = typeId || types[0]?.id || '';
+    const selectedType = types.find(t => t.id === selectedTypeId);
+    const isOther = selectedType?.label?.toLowerCase() === 'other' || selectedType?.name?.toLowerCase() === 'other';
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!coordinates) {
-            setError('Please select a location on the map');
+        if (!coordinates || !confirmed) {
+            setError('Please confirm a location on the map');
             return;
         }
 
@@ -42,12 +45,21 @@ export function ContributeIncidentForm({ onClose, onSuccess, initialCoordinates 
             return;
         }
 
+        if (isOther && !otherLabel.trim()) {
+            setError('Please describe the type of incident');
+            return;
+        }
+
+        const fullDescription = isOther && otherLabel.trim()
+            ? `[${otherLabel.trim()}] ${description}`.trim()
+            : description;
+
         await submitIncident(
             {
                 lat: coordinates.lat,
                 lng: coordinates.lng,
                 typeId: selectedTypeId,
-                description,
+                description: fullDescription,
                 image: images,
             },
             onSuccess
@@ -80,7 +92,10 @@ export function ContributeIncidentForm({ onClose, onSuccess, initialCoordinates 
                                     <select
                                         id="type"
                                         value={selectedTypeId}
-                                        onChange={(e) => setTypeId(e.target.value)}
+                                        onChange={(e) => {
+                                            setTypeId(e.target.value);
+                                            setOtherLabel('');
+                                        }}
                                         disabled={typesLoading || types.length === 0}
                                         required
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-[#fde2aeff] focus:shadow-[0_1px_3px_0_#fde2aeff] disabled:bg-gray-50"
@@ -94,6 +109,22 @@ export function ContributeIncidentForm({ onClose, onSuccess, initialCoordinates 
                                         ))}
                                     </select>
                                 </Field>
+
+                                {isOther && (
+                                    <Field>
+                                        <FieldLabel htmlFor="otherLabel">Specify Incident Type</FieldLabel>
+                                        <input
+                                            id="otherLabel"
+                                            type="text"
+                                            placeholder="e.g. Road flooding, fallen tree…"
+                                            value={otherLabel}
+                                            onChange={(e) => setOtherLabel(e.target.value)}
+                                            required
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-[#fde2aeff] focus:shadow-[0_1px_3px_0_#fde2aeff]"
+                                        />
+                                        <FieldDescription>Tell us what kind of incident this is</FieldDescription>
+                                    </Field>
+                                )}
 
                                 <Field>
                                     <FieldLabel htmlFor="description">Description</FieldLabel>
@@ -154,20 +185,49 @@ export function ContributeIncidentForm({ onClose, onSuccess, initialCoordinates 
                                 <Field>
                                     <FieldLabel>Location</FieldLabel>
                                     <div className="space-y-2">
-                                        <div
-                                            className="h-64 rounded-lg overflow-hidden border-2 border-gray-200"
-                                            style={{ cursor: 'crosshair' }}
-                                        >
+                                        <div className="relative h-64 rounded-lg overflow-hidden border-2 border-gray-200">
                                             <GebetaMap
                                                 ref={mapRef}
                                                 apiKey={apiKey}
-                                                center={coordinates ? [coordinates.lng, coordinates.lat] : [38.7578, 8.9806]}
-                                                zoom={coordinates ? 15 : 12}
-                                                onMapClick={handleMapClick}
+                                                center={initialCoordinates
+                                                    ? [initialCoordinates.lng, initialCoordinates.lat]
+                                                    : [38.7578, 8.9806]}
+                                                zoom={initialCoordinates ? 15 : 12}
                                             />
+                                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 10 }}>
+                                                <img
+                                                    src="/assets/location-pin.svg"
+                                                    style={{ width: 32, height: 32, transform: 'translateY(-50%)' }}
+                                                    alt="location pin"
+                                                />
+                                            </div>
                                         </div>
 
-                                        {coordinates && (
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={confirmCenter}
+                                                className="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md border-2 text-sm font-medium transition-all"
+                                                style={confirmed
+                                                    ? { borderColor: colors.primary.main, color: colors.primary.main, backgroundColor: '#fff8ee' }
+                                                    : { borderColor: '#d1d5db', color: '#374151' }
+                                                }
+                                            >
+                                                <CheckCircle size={16} />
+                                                {confirmed ? 'Confirmed' : 'Confirm Location'}
+                                            </button>
+                                            {confirmed && (
+                                                <button
+                                                    type="button"
+                                                    onClick={resetLocation}
+                                                    className="py-2 px-4 rounded-md border-2 border-gray-300 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
+                                                >
+                                                    Change
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {coordinates && confirmed && (
                                             <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
                                                 <div>Latitude: {coordinates.lat.toFixed(6)}</div>
                                                 <div>Longitude: {coordinates.lng.toFixed(6)}</div>
@@ -175,7 +235,7 @@ export function ContributeIncidentForm({ onClose, onSuccess, initialCoordinates 
                                         )}
                                     </div>
                                     <FieldDescription>
-                                        Click anywhere on the map to select location
+                                        Pan the map to your location, then confirm
                                     </FieldDescription>
                                 </Field>
                             </div>
@@ -198,7 +258,7 @@ export function ContributeIncidentForm({ onClose, onSuccess, initialCoordinates 
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={submitting || uploading || !coordinates || typesLoading || types.length === 0}
+                                disabled={submitting || uploading || !confirmed || typesLoading || types.length === 0}
                                 style={{ backgroundColor: colors.primary.main }}
                                 className="flex-1 text-white disabled:opacity-50"
                             >

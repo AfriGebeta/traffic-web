@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import type { GebetaMapRef } from '@gebeta/tiles';
 
 interface Coordinates {
@@ -11,30 +11,30 @@ export function useMapMarker(initialCoordinates?: Coordinates) {
     const [coordinates, setCoordinates] = useState<Coordinates | null>(
         initialCoordinates || null
     );
+    const [confirmed, setConfirmed] = useState(!!initialCoordinates);
 
-    useEffect(() => {
-        if (mapRef.current && coordinates) {
+    const confirmCenter = () => {
+        if (mapRef.current) {
             const map = mapRef.current as any;
-            map.clearMarkers();
-            map.addImageMarker(
-                [coordinates.lng, coordinates.lat],
-                '/pin.svg',
-                [30, 30],
-                () => console.log('Marker clicked!'),
-                10,
-                '<b>Selected Location</b>'
-            );
+            const mapInstance = map.getMapInstance();
+            if (mapInstance?.getCenter) {
+                const center = mapInstance.getCenter();
+                setCoordinates({ lat: center.lat, lng: center.lng });
+                setConfirmed(true);
+            }
         }
-    }, [coordinates]);
+    };
 
-    const handleMapClick = (lngLat: [number, number]) => {
-        const [lng, lat] = lngLat;
-        setCoordinates({ lat, lng });
+    const resetLocation = () => {
+        setConfirmed(false);
+        setCoordinates(null);
     };
 
     return {
         mapRef,
         coordinates,
-        handleMapClick,
+        confirmed,
+        confirmCenter,
+        resetLocation,
     };
 }
