@@ -42,7 +42,11 @@ export function AuthAvatar() {
                     {user ? user.name.charAt(0).toUpperCase() : <User size={20} color="white" />}
                 </button>
             </PopoverTrigger>
-            <PopoverContent side="right" align="start" className="w-48 p-2">
+            <PopoverContent
+                side="bottom"
+                align="end"
+                className=" w-[90vw] max-w-[220px] sm:w-48 p-2 z-[9999]"
+            >
                 <div className="space-y-1">
                     <h3 className="font-semibold text-sm mb-1 px-2">{user ? 'Profile' : 'Menu'}</h3>
                     <div className="border-t border-gray-200 my-1"></div>
