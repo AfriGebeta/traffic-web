@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { X, Share2 } from 'lucide-react';
 import type { Place } from '../types/place';
+import { getPlaceLatitude, getPlaceLongitude, getPlaceCity, getPlaceCountry, getPlaceType } from '../types/place';
 import { colors } from '@/shared/theme/colors';
+import { Toast } from '@/components/Toast';
 
 interface PlaceModalProps {
   place: Place;
@@ -9,17 +12,37 @@ interface PlaceModalProps {
 }
 
 export function PlaceModal({ place, onClose, onDirections }: PlaceModalProps) {
+  const [showToast, setShowToast] = useState(false);
+
+  const handleNavigate = () => {
+    const params = new URLSearchParams({
+      navigate: 'true',
+      lat: getPlaceLatitude(place).toString(),
+      lng: getPlaceLongitude(place).toString(),
+      name: place.name,
+      city: getPlaceCity(place),
+      country: getPlaceCountry(place),
+      type: getPlaceType(place),
+    });
+    const schemeUrl = `trafficapp://?${params.toString()}`;
+    window.location.href = schemeUrl;
+
+    setTimeout(() => {
+      setShowToast(true);
+    }, 2500);
+  };
+
   const handleShare = async () => {
     const url = new URL(window.location.href);
-    url.searchParams.set('lat', place.latitude.toString());
-    url.searchParams.set('lng', place.longitude.toString());
+    url.searchParams.set('lat', getPlaceLatitude(place).toString());
+    url.searchParams.set('lng', getPlaceLongitude(place).toString());
     url.searchParams.set('name', encodeURIComponent(place.name));
-    url.searchParams.set('city', place.City);
-    url.searchParams.set('country', place.Country);
-    url.searchParams.set('type', place.type);
-    
+    url.searchParams.set('city', getPlaceCity(place));
+    url.searchParams.set('country', getPlaceCountry(place));
+    url.searchParams.set('type', getPlaceType(place));
+
     const shareUrl = url.toString();
-    
+
     try {
       await navigator.clipboard.writeText(shareUrl);
       alert('Link copied to clipboard!');
@@ -45,23 +68,23 @@ export function PlaceModal({ place, onClose, onDirections }: PlaceModalProps) {
       <div className="p-4 space-y-2">
         <div className="flex items-start gap-2">
           <span className="text-xs font-medium text-gray-500 min-w-20">Type:</span>
-          <span className="text-xs text-gray-900">{place.type}</span>
+          <span className="text-xs text-gray-900">{getPlaceType(place)}</span>
         </div>
-        
+
         <div className="flex items-start gap-2">
           <span className="text-xs font-medium text-gray-500 min-w-20">City:</span>
-          <span className="text-xs text-gray-900">{place.City}</span>
+          <span className="text-xs text-gray-900">{getPlaceCity(place)}</span>
         </div>
-        
+
         <div className="flex items-start gap-2">
           <span className="text-xs font-medium text-gray-500 min-w-20">Country:</span>
-          <span className="text-xs text-gray-900">{place.Country}</span>
+          <span className="text-xs text-gray-900">{getPlaceCountry(place)}</span>
         </div>
-        
+
         <div className="flex items-start gap-2">
           <span className="text-xs font-medium text-gray-500 min-w-20">Coordinates:</span>
           <span className="text-xs text-gray-900">
-            {place.latitude.toFixed(6)}, {place.longitude.toFixed(6)}
+            {getPlaceLatitude(place).toFixed(6)}, {getPlaceLongitude(place).toFixed(6)}
           </span>
         </div>
       </div>
@@ -80,7 +103,21 @@ export function PlaceModal({ place, onClose, onDirections }: PlaceModalProps) {
         >
           Directions
         </button>
-        
+
+        <button
+          onClick={handleNavigate}
+          className="w-full text-white font-medium py-2.5 px-4 rounded-xl transition-colors"
+          style={{ backgroundColor: colors.primary.main }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colors.primary.dark;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = colors.primary.main;
+          }}
+        >
+          Navigate in App
+        </button>
+
         <button
           onClick={handleShare}
           className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
@@ -89,6 +126,13 @@ export function PlaceModal({ place, onClose, onDirections }: PlaceModalProps) {
           Share
         </button>
       </div>
+
+      {showToast && (
+        <Toast
+          message="App not installed. Download coming soon!"
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 }

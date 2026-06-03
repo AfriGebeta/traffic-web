@@ -24,6 +24,7 @@ import {
   type CategoryKey,
 } from "../../modules/nearby/types/types";
 import type { Place } from "../types/place";
+import { getPlaceLatitude, getPlaceLongitude } from "../types/place";
 import type { NearbyPlace } from "../../modules/nearby/types/types";
 import type { Coordinates } from "../hooks/useGeolocation";
 
@@ -133,7 +134,19 @@ export function Map() {
 
     if (lat && lng && name) {
       const place: Place = {
+        id: "",
         name: decodeURIComponent(name),
+        display_name: decodeURIComponent(name),
+        category: params.get("type") || "place",
+        location: {
+          lat: parseFloat(lat),
+          lng: parseFloat(lng),
+        },
+        address: {
+          city: params.get("city") || "",
+          country: params.get("country") || "",
+          country_code: params.get("country_code") || "",
+        },
         latitude: parseFloat(lat),
         longitude: parseFloat(lng),
         City: params.get("city") || "",
@@ -147,7 +160,7 @@ export function Map() {
         if (mapRef.current) {
           addLocationMarker(
             mapRef.current,
-            [place.longitude, place.latitude],
+            [getPlaceLongitude(place), getPlaceLatitude(place)],
             place.name,
             "/assets/location-pin.svg",
           );
@@ -189,7 +202,7 @@ export function Map() {
 
   const handlePlaceSelect = (place: Place) => {
     if (mapRef.current) {
-      const location: [number, number] = [place.longitude, place.latitude];
+      const location: [number, number] = [getPlaceLongitude(place), getPlaceLatitude(place)];
 
       const map = mapRef.current as unknown as MapInstance;
       const mapInstance = map.getMapInstance();
@@ -334,7 +347,20 @@ export function Map() {
     }
 
     const placeData: Place = {
+      id: `place-${place.latitude}-${place.longitude}`,
       name: place.name,
+      display_name: place.name,
+      category: place.type || 'place',
+      location: {
+        lat: place.latitude,
+        lng: place.longitude,
+      },
+      address: {
+        city: place.City ?? '',
+        country: place.Country ?? '',
+        country_code: '',
+      },
+
       latitude: place.latitude,
       longitude: place.longitude,
       City: place.City,
@@ -351,7 +377,7 @@ export function Map() {
       const mapInstance = map.getMapInstance();
       if (mapInstance && mapInstance.flyTo) {
         mapInstance.flyTo({
-          center: [place.longitude, place.latitude],
+          center: [getPlaceLongitude(place), getPlaceLatitude(place)],
           zoom: 17,
           essential: true,
           speed: 2,
@@ -362,7 +388,7 @@ export function Map() {
       map.clearMarkers();
 
       map.addImageMarker(
-        [place.longitude, place.latitude],
+        [getPlaceLongitude(place), getPlaceLatitude(place)],
         "/assets/location-pin.svg",
         [30, 30],
         () => { },
@@ -374,12 +400,24 @@ export function Map() {
     }
 
     const placeData: Place = {
+      id: place.id || "",
       name: place.name,
-      latitude: place.latitude,
-      longitude: place.longitude,
-      City: place.City,
-      Country: place.Country,
-      type: place.type || "explore",
+      display_name: place.display_name || place.name,
+      category: place.category || place.type || "explore",
+      location: {
+        lat: getPlaceLatitude(place),
+        lng: getPlaceLongitude(place),
+      },
+      address: place.address || {
+        city: place.City || "",
+        country: place.Country || "",
+        country_code: "",
+      },
+      latitude: getPlaceLatitude(place),
+      longitude: getPlaceLongitude(place),
+      City: place.City || place.address?.city || "",
+      Country: place.Country || place.address?.country || "",
+      type: place.type || place.category || "explore",
     };
     setSelectedPlace(placeData);
   };
@@ -395,7 +433,7 @@ export function Map() {
         origin,
         "/pin.svg",
         [30, 30],
-        () => {},
+        () => { },
         10,
         "Your Location",
       );
@@ -406,17 +444,17 @@ export function Map() {
           latLngToMap(wp.lat, wp.lng),
           "/assets/location-pin-2.png",
           [30, 30],
-          () => {},
+          () => { },
           10,
           `<b>${label}</b>`,
         );
       });
 
       map.addImageMarker(
-        latLngToMap(destination.latitude, destination.longitude),
+        latLngToMap(getPlaceLatitude(destination), getPlaceLongitude(destination)),
         "/assets/location-pin.svg",
         [30, 30],
-        () => {},
+        () => { },
         10,
         `<b>${destination.name}</b>`,
       );
@@ -442,8 +480,8 @@ export function Map() {
 
         const originApi = lngLatToApi(origin);
         const destinationApi: [number, number] = [
-          destination.latitude,
-          destination.longitude,
+          getPlaceLatitude(destination),
+          getPlaceLongitude(destination),
         ];
         const waypointsApi = stops.map(
           (wp) => [wp.lat, wp.lng] as [number, number],
@@ -484,7 +522,7 @@ export function Map() {
               position,
               "/pin.svg",
               [30, 30],
-              () => {},
+              () => { },
               20,
               "",
             );
@@ -521,7 +559,7 @@ export function Map() {
           latLngToMap(waypoint.lat, waypoint.lng),
           "/assets/location-pin-2.png",
           [30, 30],
-          () => {},
+          () => { },
           15,
           `<b>${label}</b>`,
         );
@@ -575,11 +613,11 @@ export function Map() {
   }, []);
 
   const handleWaypointSelect = (place: Place) => {
-    flyToCoords(place.longitude, place.latitude);
+    flyToCoords(getPlaceLongitude(place), getPlaceLatitude(place));
     appendWaypoint({
       id: crypto.randomUUID(),
-      lat: place.latitude,
-      lng: place.longitude,
+      lat: getPlaceLatitude(place),
+      lng: getPlaceLongitude(place),
       name: place.name,
     });
   };

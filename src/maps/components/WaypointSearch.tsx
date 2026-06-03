@@ -89,7 +89,7 @@ export function WaypointSearch({
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 max-h-44 overflow-y-auto">
           {results.map((place, index) => (
             <button
-              key={`${place.name}-${index}`}
+              key={`${place.id}-${index}`}
               type="button"
               onClick={() => handleSelect(place)}
               className="w-full flex items-center gap-2 px-3 py-2.5 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 first:rounded-t-xl last:rounded-b-xl"
@@ -98,7 +98,7 @@ export function WaypointSearch({
               <div className="min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{place.name}</p>
                 <p className="text-xs text-gray-500 truncate">
-                  {[place.City, place.Country].filter(Boolean).join(', ')}
+                  {place.display_name || [place.address?.city || place.City, place.address?.country || place.Country].filter(Boolean).join(', ')}
                 </p>
               </div>
             </button>
@@ -113,11 +113,10 @@ export function WaypointSearch({
       <button
         type="button"
         onClick={onPickOnMap}
-        className={`flex items-center gap-1.5 text-xs font-medium transition-colors pl-1 ${
-          isPickingOnMap
-            ? 'text-orange-600'
-            : 'text-gray-500 hover:text-orange-600'
-        }`}
+        className={`flex items-center gap-1.5 text-xs font-medium transition-colors pl-1 ${isPickingOnMap
+          ? 'text-orange-600'
+          : 'text-gray-500 hover:text-orange-600'
+          }`}
       >
         <Map size={13} />
         {isPickingOnMap ? 'Click on the map to place stop…' : 'Choose on map'}

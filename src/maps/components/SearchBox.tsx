@@ -91,7 +91,7 @@ export function SearchBox({
                         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg max-h-96 overflow-y-auto z-[9999] border border-gray-200">
                             {results.map((place, index) => (
                                 <div
-                                    key={`${place.name}-${index}`}
+                                    key={`${place.id}-${index}`}
                                     onClick={() => handlePlaceClick(place)}
                                     className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-100 transition-colors border-b border-gray-100 last:border-b-0 first:rounded-t-2xl last:rounded-b-2xl"
                                 >
@@ -101,7 +101,7 @@ export function SearchBox({
                                             {place.name}
                                         </div>
                                         <div className="text-xs text-gray-600 truncate">
-                                            {place.City}, {place.Country}
+                                            {place.display_name || [place.address?.city || place.City, place.address?.country || place.Country].filter(Boolean).join(', ')}
                                         </div>
                                     </div>
                                 </div>
