@@ -15,9 +15,10 @@ import { useGeolocation } from "../hooks/useGeolocation";
 import { useSearch } from "../hooks/useSearch";
 import { addLocationMarker } from "../utils/mapMarkers";
 import { getNavigation } from "../navigation/service";
-import type { Waypoint } from "../navigation/types";
+import type { Waypoint, Costing } from "../navigation/types";
 import { decodeRouteCoordinates, lngLatToApi, latLngToMap } from "../utils/navigationRoute";
 import { animateMarkerAlongRoute } from "../utils/animateMarker";
+import { addDashedRoute, removeDashedRoute } from "../utils/mapLayers";
 import { searchNearbyPlaces } from "../../modules/nearby/services/service";
 import {
   PLACE_CATEGORIES,
@@ -77,6 +78,11 @@ interface MapLibreInstance {
   }) => void;
   setStyle: (styleUrl: string | Record<string, unknown>) => void;
   getCanvas?: () => HTMLCanvasElement;
+  addSource: (id: string, config: any) => void;
+  addLayer: (config: any) => void;
+  getSource: (id: string) => any;
+  removeLayer: (id: string) => void;
+  removeSource: (id: string) => void;
 }
 
 interface MapInstance {
@@ -92,7 +98,7 @@ interface MapInstance {
     zIndex: number,
     popup: string,
   ) => void;
-  addPath: (coordinates: [number, number][], color: string, width: number) => void;
+  addPath: (coordinates: [number, number][], color: string, width: number, dashArray?: number[]) => void;
 }
 
 export function Map() {
@@ -125,6 +131,7 @@ export function Map() {
   const [nearbyPlaces, setNearbyPlaces] = useState<NearbyPlace[]>([]);
   const [showNearbyList, setShowNearbyList] = useState(false);
   const [mapStyle, setMapStyle] = useState<string>("default");
+  const [navigationMode, setNavigationMode] = useState<Costing>('auto');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -234,6 +241,10 @@ export function Map() {
 
     if (mapRef.current) {
       const map = mapRef.current as unknown as MapInstance;
+      const mapInstance = map.getMapInstance();
+
+      removeDashedRoute(mapInstance);
+
       map.clearMarkers();
       map.clearRoute();
       map.clearPaths();
@@ -463,9 +474,12 @@ export function Map() {
   );
 
   const fetchAndDrawRoute = useCallback(
-    async (stops: Waypoint[]) => {
+    async (stops: Waypoint[], mode?: Costing) => {
       const destination = selectedPlaceRef.current;
       if (!destination || !mapRef.current) return;
+
+
+      const currentMode = mode ?? navigationMode;
 
       setIsRouteLoading(true);
 
@@ -491,6 +505,7 @@ export function Map() {
           originApi,
           destinationApi,
           waypointsApi,
+          currentMode,
         );
 
         const legs = response.data?.trip?.legs;
@@ -500,9 +515,21 @@ export function Map() {
         if (routeCoordinates.length === 0) return;
 
         const map = mapRef.current as unknown as MapInstance;
+        const mapInstance = map.getMapInstance();
+
         map.clearMarkers();
         map.clearPaths();
-        map.addPath(routeCoordinates, "#ffa500", 5);
+
+        removeDashedRoute(mapInstance);
+
+        const routeColor = currentMode === 'pedestrian' ? '#4285f4' : '#ffa500';
+        const routeWidth = currentMode === 'pedestrian' ? 4 : 5;
+
+        if (currentMode === 'pedestrian') {
+          addDashedRoute(mapInstance, routeCoordinates, routeColor, routeWidth);
+        } else {
+          map.addPath(routeCoordinates, routeColor, routeWidth);
+        }
 
         drawRouteMarkers(map, origin, stops, destination);
 
@@ -537,7 +564,7 @@ export function Map() {
         setIsRouteLoading(false);
       }
     },
-    [getCurrentLocation, drawRouteMarkers],
+    [getCurrentLocation, drawRouteMarkers, navigationMode],
   );
 
   useEffect(() => { waypointsRef.current = waypoints; }, [waypoints]);
@@ -577,8 +604,14 @@ export function Map() {
     setIsDirectionsActive(true);
     setWaypoints([]);
     waypointsRef.current = [];
+    setNavigationMode('auto');
     resetDirectionsUi();
     await fetchAndDrawRoute([]);
+  };
+
+  const handleNavigationModeChange = (mode: Costing) => {
+    setNavigationMode(mode);
+    void fetchAndDrawRoute(waypoints, mode);
   };
 
   const handleAddStopClick = () => {
@@ -728,12 +761,14 @@ export function Map() {
                     isLoading={isRouteLoading}
                     waypointSearchResults={waypointSearchResults}
                     isWaypointSearching={isWaypointSearching}
+                    navigationMode={navigationMode}
                     onAddStopClick={handleAddStopClick}
                     onCancelAddStop={handleCancelAddStop}
                     onWaypointSearch={searchWaypoint}
                     onWaypointSelect={handleWaypointSelect}
                     onPickOnMap={handlePickOnMap}
                     onRemoveWaypoint={handleRemoveWaypoint}
+                    onNavigationModeChange={handleNavigationModeChange}
                     onClose={handleCloseDirections}
                   />
                 ) : (

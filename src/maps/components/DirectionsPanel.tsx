@@ -1,8 +1,9 @@
 import { X, Plus, Navigation } from 'lucide-react';
 import type { Place } from '../types/place';
-import type { Waypoint } from '../navigation/types';
+import type { Waypoint, Costing } from '../navigation/types';
 import { colors } from '@/shared/theme/colors';
 import { WaypointSearch } from './WaypointSearch';
+import { NavigationModeSwitch } from './NavigationModeSwitch';
 
 interface DirectionsPanelProps {
   destination: Place;
@@ -12,12 +13,14 @@ interface DirectionsPanelProps {
   isLoading: boolean;
   waypointSearchResults: Place[];
   isWaypointSearching: boolean;
+  navigationMode: Costing;
   onAddStopClick: () => void;
   onCancelAddStop: () => void;
   onWaypointSearch: (query: string) => void;
   onWaypointSelect: (place: Place) => void;
   onPickOnMap: () => void;
   onRemoveWaypoint: (id: string) => void;
+  onNavigationModeChange: (mode: Costing) => void;
   onClose: () => void;
 }
 
@@ -29,12 +32,14 @@ export function DirectionsPanel({
   isLoading,
   waypointSearchResults,
   isWaypointSearching,
+  navigationMode,
   onAddStopClick,
   onCancelAddStop,
   onWaypointSearch,
   onWaypointSelect,
   onPickOnMap,
   onRemoveWaypoint,
+  onNavigationModeChange,
   onClose,
 }: DirectionsPanelProps) {
   return (
@@ -50,7 +55,14 @@ export function DirectionsPanel({
         </button>
       </div>
 
-      <div className="px-4 pt-3 pb-1">
+      <div className="px-4 pt-3 pb-3">
+        <NavigationModeSwitch
+          selectedMode={navigationMode}
+          onModeChange={onNavigationModeChange}
+        />
+      </div>
+
+      <div className="px-4 pt-1 pb-1">
         <div className="flex items-start gap-3 pb-2">
           <div className="flex flex-col items-center pt-1 shrink-0">
             <div

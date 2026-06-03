@@ -1,7 +1,10 @@
+export type Costing = "auto" | "bicycle" | "pedestrian";
+
 export interface NavigationRequest {
   origin: [number, number];
   destination: [number, number];
   waypoints?: [number, number][];
+  costing?: Costing;
 }
 
 export interface NavigationLeg {
