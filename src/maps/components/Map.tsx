@@ -572,6 +572,13 @@ export function Map() {
   useEffect(() => { selectedPlaceRef.current = selectedPlace; }, [selectedPlace]);
   useEffect(() => { userLocationRef.current = userLocation; }, [userLocation]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleStyleChange("default");
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
   const appendWaypoint = useCallback(
     (waypoint: Waypoint) => {
       const updated = [...waypointsRef.current, waypoint];
@@ -738,7 +745,7 @@ export function Map() {
                 isSearching={isSearching}
                 results={results}
                 onSearch={search}
-                onClear={clearResults}
+                onClear={() => { clearResults(); setSelectedPlace(null); }}
               />
             </div>
 
