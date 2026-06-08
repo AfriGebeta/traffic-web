@@ -62,5 +62,5 @@ export function removeDashedRoute(
             mapInstance.removeSource(sourceId);
         }
     } catch (e) {
-    }
+  }
 }
