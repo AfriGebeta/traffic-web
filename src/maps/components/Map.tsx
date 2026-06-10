@@ -28,6 +28,8 @@ import type { Place } from "../types/place";
 import { getPlaceLatitude, getPlaceLongitude } from "../types/place";
 import type { NearbyPlace } from "../../modules/nearby/types/types";
 import type { Coordinates } from "../hooks/useGeolocation";
+import { useMapView } from "../hooks/useMapView";
+import { useMapViewSync } from "../hooks/useMapViewSync";
 
 const apiKey = import.meta.env.VITE_GEBETA_API_KEY;
 
@@ -111,6 +113,7 @@ export function Map() {
     search: searchWaypoint,
     clearResults: clearWaypointSearch,
   } = useSearch();
+  const { center, zoom } = useMapView();
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
   const [isDirectionsActive, setIsDirectionsActive] = useState(false);
@@ -132,6 +135,14 @@ export function Map() {
   const [showNearbyList, setShowNearbyList] = useState(false);
   const [mapStyle, setMapStyle] = useState<string>("default");
   const [navigationMode, setNavigationMode] = useState<Costing>('auto');
+
+  const getMapLibreInstance = useCallback(() => {
+    if (!mapRef.current) return null;
+    const map = mapRef.current as unknown as MapInstance;
+    return map.getMapInstance() as any;
+  }, []);
+
+  useMapViewSync(getMapLibreInstance);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -731,8 +742,8 @@ export function Map() {
       <GebetaMap
         ref={mapRef}
         apiKey={apiKey}
-        center={[38.7685, 9.0161]}
-        zoom={12}
+        center={center}   // was [38.7685, 9.0161]
+        zoom={zoom}
         onMapClick={handleGebetaMapClick}
       />
 
