@@ -3,10 +3,11 @@ import { Compass, Plus } from 'lucide-react';
 import { colors } from '@/shared/theme/colors';
 import { ContributeForm } from '@/modules/places/components/ContributeForm';
 import { ContributeIncidentForm } from '@/modules/incidents/components/ContributeIncidentForm';
+import { ContributeTaxiRouteForm } from '@/modules/taxi/components/ContributeTaxiRouteForm';
 import { ContributeChoiceModal } from '@/shared/components/ContributeChoiceModal';
 import { ExploreDrawer } from '@/modules/explore/components/ExploreDrawer';
 
-type ContributeView = 'choice' | 'place' | 'incident' | null;
+type ContributeView = 'choice' | 'place' | 'incident' | 'taxiRoute' | null;
 
 interface BottomSheetProps {
     userLocation: [number, number] | null;
@@ -32,6 +33,11 @@ export function BottomSheet({ userLocation, onExplorePlaceClick }: BottomSheetPr
     const handleIncidentSuccess = () => {
         closeContribute();
         alert('Incident reported successfully!');
+    };
+
+    const handleTaxiRouteSuccess = () => {
+        closeContribute();
+        alert('Taxi route submitted successfully!');
     };
 
     const handleExploreClick = () => {
@@ -101,6 +107,7 @@ export function BottomSheet({ userLocation, onExplorePlaceClick }: BottomSheetPr
                     onClose={closeContribute}
                     onSelectPlace={() => setContributeView('place')}
                     onSelectIncident={() => setContributeView('incident')}
+                    onSelectTaxiRoute={() => setContributeView('taxiRoute')}
                 />
             )}
 
@@ -116,6 +123,14 @@ export function BottomSheet({ userLocation, onExplorePlaceClick }: BottomSheetPr
                 <ContributeIncidentForm
                     onClose={closeContribute}
                     onSuccess={handleIncidentSuccess}
+                    initialCoordinates={initialCoordinates}
+                />
+            )}
+
+            {contributeView === 'taxiRoute' && (
+                <ContributeTaxiRouteForm
+                    onClose={closeContribute}
+                    onSuccess={handleTaxiRouteSuccess}
                     initialCoordinates={initialCoordinates}
                 />
             )}
