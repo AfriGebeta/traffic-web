@@ -1,4 +1,5 @@
 export interface NearbyPlace {
+    id?: string;
     name: string;
     latitude: number;
     longitude: number;
@@ -13,15 +14,31 @@ export interface NearbyRequest {
         lat: number;
         lng: number;
     };
-    type: string;
-    cursor?: number;
-    limit?: number;
+    category: string;
+    size?: number;
+}
+
+export interface RevGeocodingResult {
+    id: string;
+    name: string;
+    display_name: string;
+    category: string;
+    location: {
+        lat: number;
+        lng: number;
+    };
+    address: {
+        city?: string;
+        country?: string;
+        country_code?: string;
+    };
 }
 
 export interface NearbyResponse {
-    response?: NearbyPlace[];
-    results?: NearbyPlace[];
-    data?: NearbyPlace[];
+    response?: {
+        query: string;
+        results: RevGeocodingResult[];
+    };
 }
 
 export const PLACE_CATEGORIES = {

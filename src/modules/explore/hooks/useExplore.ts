@@ -24,7 +24,7 @@ export function useExplore() {
         setError('');
 
         try {
-            const data = await exploreService.getNearbyPlaces(lat, lng, category, 20);
+            const data = await exploreService.getNearbyPlaces(lat, lng, category, 5);
             setPlaces(prev => ({ ...prev, [category]: data }));
         } catch (err) {
             setError('Failed to fetch places');

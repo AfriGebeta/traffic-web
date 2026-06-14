@@ -4,21 +4,28 @@ import type { NearbyResponse, NearbyPlace } from '../types/types';
 export async function searchNearbyPlaces(
   lat: number,
   lng: number,
-  placeType: string,
-  cursor: number = 0,
-  limit: number = 20
+  category: string,
+  size: number = 5
 ): Promise<NearbyPlace[]> {
-  
+
   const response = await api.post<NearbyResponse>(
     '/api/navigation/request-revgeocoding',
     {
       coordinate: { lat, lng },
-      type: placeType,
-      cursor,
-      limit,
+      category,
+      size,
     }
   );
 
+  const results = response.response?.results ?? [];
 
-  return response.response || response.results || response.data || [];
+  return results.map((result) => ({
+    id: result.id,
+    name: result.name,
+    latitude: result.location.lat,
+    longitude: result.location.lng,
+    type: result.category,
+    City: result.address?.city ?? '',
+    Country: result.address?.country ?? '',
+  }));
 }

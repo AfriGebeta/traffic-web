@@ -1,31 +1,34 @@
 import { api } from '@/shared/services/api';
-import type { ExplorePlace, ExploreCategory } from '../types/types';
-
-interface ReverseGeocodingResponse {
-    response: ExplorePlace[];
-}
+import type { ExplorePlace, ExploreCategory, ReverseGeocodingResponse } from '../types/types';
 
 export const exploreService = {
     async getNearbyPlaces(
         lat: number,
         lng: number,
-        type: ExploreCategory,
-        limit: number = 20
+        category: ExploreCategory,
+        size: number = 5
     ): Promise<ExplorePlace[]> {
         try {
-            console.log('Fetching places:', { lat, lng, type, limit });
             const response = await api.post<ReverseGeocodingResponse>(
                 '/api/navigation/request-revgeocoding',
                 {
                     coordinate: { lat, lng },
-                    type,
-                    cursor: 0,
-                    limit,
+                    category,
+                    size,
                 }
             );
 
-            const places = response.response || [];
-            return places;
+            const results = response.response?.results ?? [];
+
+            return results.map((result) => ({
+                id: result.id,
+                name: result.name,
+                latitude: result.location.lat,
+                longitude: result.location.lng,
+                type: result.category,
+                City: result.address?.city ?? '',
+                Country: result.address?.country ?? '',
+            }));
         } catch (error) {
             console.error('Error fetching nearby places:', error);
             throw error;
