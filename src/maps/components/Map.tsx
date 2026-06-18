@@ -18,6 +18,7 @@ import { getNavigation } from "../navigation/service";
 import type { Waypoint, Costing } from "../navigation/types";
 import { decodeRouteCoordinates, lngLatToApi, latLngToMap } from "../utils/navigationRoute";
 import { findPoiAtPoint, type PoiHit } from "../utils/poiFeature";
+import { reverseGeocodeAddress } from "../services/geocoding";
 import { animateMarkerAlongRoute } from "../utils/animateMarker";
 import { addDashedRoute, removeDashedRoute } from "../utils/mapLayers";
 import { searchNearbyPlaces } from "../../modules/nearby/services/service";
@@ -686,31 +687,22 @@ export function Map() {
 
   const enrichSelectedPlace = useCallback(
     async (placeId: string, lat: number, lng: number) => {
-      try {
-        const results = await mapRef.current?.reverseGeocode(lat, lng);
-        const top = results?.[0] as Record<string, any> | undefined;
-        if (!top) return;
+      const address = await reverseGeocodeAddress(lat, lng);
+      if (!address || (!address.city && !address.country)) return;
 
-        const city = top.City ?? top.city ?? top.address?.city ?? "";
-        const country = top.Country ?? top.country ?? top.address?.country ?? "";
-        if (!city && !country) return;
-
-        setSelectedPlace((prev) => {
-          if (!prev || prev.id !== placeId) return prev;
-          return {
-            ...prev,
-            City: prev.City || city,
-            Country: prev.Country || country,
-            address: {
-              ...prev.address,
-              city: prev.address.city || city,
-              country: prev.address.country || country,
-            },
-          };
-        });
-      } catch (error) {
-        console.error("Reverse geocoding failed:", error);
-      }
+      setSelectedPlace((prev) => {
+        if (!prev || prev.id !== placeId) return prev;
+        return {
+          ...prev,
+          City: prev.City || address.city,
+          Country: prev.Country || address.country,
+          address: {
+            ...prev.address,
+            city: prev.address.city || address.city,
+            country: prev.address.country || address.country,
+          },
+        };
+      });
     },
     [],
   );
