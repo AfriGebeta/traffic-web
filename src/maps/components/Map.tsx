@@ -1,7 +1,7 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import GebetaMap from "@gebeta/tiles";
-import type { GebetaMapRef } from "@gebeta/tiles";
+import type { GebetaMapRef, MapMouseEvent } from "@gebeta/tiles";
 import { LocationButton } from "./LocationButton";
 import { MapStyleButton } from "./MapStyleButton";
 import { SearchBox } from "./SearchBox";
@@ -17,6 +17,7 @@ import { addLocationMarker } from "../utils/mapMarkers";
 import { getNavigation } from "../navigation/service";
 import type { Waypoint, Costing } from "../navigation/types";
 import { decodeRouteCoordinates, lngLatToApi, latLngToMap } from "../utils/navigationRoute";
+import { findPoiAtPoint, type PoiHit } from "../utils/poiFeature";
 import { animateMarkerAlongRoute } from "../utils/animateMarker";
 import { addDashedRoute, removeDashedRoute } from "../utils/mapLayers";
 import { searchNearbyPlaces } from "../../modules/nearby/services/service";
@@ -80,6 +81,7 @@ interface MapLibreInstance {
   }) => void;
   setStyle: (styleUrl: string | Record<string, unknown>) => void;
   getCanvas?: () => HTMLCanvasElement;
+  queryRenderedFeatures: (point: { x: number; y: number }) => any[];
   addSource: (id: string, config: any) => void;
   addLayer: (config: any) => void;
   getSource: (id: string) => any;
@@ -124,6 +126,7 @@ export function Map() {
   const animationCleanup = useRef<(() => void) | null>(null);
   const waypointsRef = useRef<Waypoint[]>([]);
   const isPickingOnMapRef = useRef(false);
+  const isDirectionsActiveRef = useRef(false);
 
   const selectedPlaceRef = useRef<Place | null>(null);
   const userLocationRef = useRef<Coordinates | null>(null);
@@ -580,6 +583,7 @@ export function Map() {
 
   useEffect(() => { waypointsRef.current = waypoints; }, [waypoints]);
   useEffect(() => { isPickingOnMapRef.current = isPickingOnMap; }, [isPickingOnMap]);
+  useEffect(() => { isDirectionsActiveRef.current = isDirectionsActive; }, [isDirectionsActive]);
   useEffect(() => { selectedPlaceRef.current = selectedPlace; }, [selectedPlace]);
   useEffect(() => { userLocationRef.current = userLocation; }, [userLocation]);
 
@@ -680,18 +684,109 @@ export function Map() {
     void fetchAndDrawRoute(updated);
   };
 
-  const handleGebetaMapClick = useCallback(
-    (lngLat: [number, number]) => {
-      if (!isPickingOnMapRef.current) return;
-      const [lng, lat] = lngLat;
-      flyToCoords(lng, lat);
-      appendWaypoint({
-        id: crypto.randomUUID(),
-        lat,
-        lng,
-      });
+  const enrichSelectedPlace = useCallback(
+    async (placeId: string, lat: number, lng: number) => {
+      try {
+        const results = await mapRef.current?.reverseGeocode(lat, lng);
+        const top = results?.[0] as Record<string, any> | undefined;
+        if (!top) return;
+
+        const city = top.City ?? top.city ?? top.address?.city ?? "";
+        const country = top.Country ?? top.country ?? top.address?.country ?? "";
+        if (!city && !country) return;
+
+        setSelectedPlace((prev) => {
+          if (!prev || prev.id !== placeId) return prev;
+          return {
+            ...prev,
+            City: prev.City || city,
+            Country: prev.Country || country,
+            address: {
+              ...prev.address,
+              city: prev.address.city || city,
+              country: prev.address.country || country,
+            },
+          };
+        });
+      } catch (error) {
+        console.error("Reverse geocoding failed:", error);
+      }
     },
-    [appendWaypoint, flyToCoords],
+    [],
+  );
+
+  const handlePoiSelect = useCallback(
+    (hit: PoiHit) => {
+      const place: Place = {
+        id: `poi-${hit.lat}-${hit.lng}`,
+        name: hit.name,
+        display_name: hit.name,
+        category: hit.category,
+        location: { lat: hit.lat, lng: hit.lng },
+        address: { city: "", country: "", country_code: "" },
+        latitude: hit.lat,
+        longitude: hit.lng,
+        City: "",
+        Country: "",
+        type: hit.category,
+      };
+
+      if (mapRef.current) {
+        const map = mapRef.current as unknown as MapInstance;
+        map.clearMarkers();
+        map.addImageMarker(
+          [hit.lng, hit.lat],
+          "/assets/location-pin.svg",
+          [30, 30],
+          () => { },
+          10,
+          `<b>${hit.name}</b>`,
+        );
+
+        const mapInstance = map.getMapInstance();
+        if (mapInstance?.flyTo) {
+          mapInstance.flyTo({
+            center: [hit.lng, hit.lat],
+            zoom: 17,
+            essential: true,
+            speed: 2,
+            curve: 1,
+          });
+        }
+      }
+
+      setSelectedPlace(place);
+      void enrichSelectedPlace(place.id, hit.lat, hit.lng);
+    },
+    [enrichSelectedPlace],
+  );
+
+  const handleGebetaMapClick = useCallback(
+    (lngLat: [number, number], event: MapMouseEvent) => {
+      const [lng, lat] = lngLat;
+
+      if (isPickingOnMapRef.current) {
+        flyToCoords(lng, lat);
+        appendWaypoint({
+          id: crypto.randomUUID(),
+          lat,
+          lng,
+        });
+        return;
+      }
+
+      if (isDirectionsActiveRef.current) return;
+
+      const map = mapRef.current as unknown as MapInstance | null;
+      const mapInstance = map?.getMapInstance?.();
+      if (!mapInstance || !event?.point) return;
+
+      const hit = findPoiAtPoint(mapInstance, event.point, lngLat);
+      if (!hit) return;
+
+      handlePoiSelect(hit);
+    },
+    [appendWaypoint, flyToCoords, handlePoiSelect],
   );
 
   useEffect(() => {
