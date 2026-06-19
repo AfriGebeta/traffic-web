@@ -753,6 +753,41 @@ export function Map() {
     [enrichSelectedPlace],
   );
 
+  const handleDroppedPin = useCallback(
+    (lng: number, lat: number) => {
+      const place: Place = {
+        id: `pin-${lat}-${lng}`,
+        name: "Dropped pin",
+        display_name: "Dropped pin",
+        category: "location",
+        location: { lat, lng },
+        address: { city: "", country: "", country_code: "" },
+        latitude: lat,
+        longitude: lng,
+        City: "",
+        Country: "",
+        type: "location",
+      };
+
+      if (mapRef.current) {
+        const map = mapRef.current as unknown as MapInstance;
+        map.clearMarkers();
+        map.addImageMarker(
+          [lng, lat],
+          "/assets/location-pin.svg",
+          [30, 30],
+          () => { },
+          10,
+          `<b>Dropped pin</b>`,
+        );
+      }
+
+      setSelectedPlace(place);
+      void enrichSelectedPlace(place.id, lat, lng);
+    },
+    [enrichSelectedPlace],
+  );
+
   const handleGebetaMapClick = useCallback(
     (lngLat: [number, number], event: MapMouseEvent) => {
       const [lng, lat] = lngLat;
@@ -771,14 +806,19 @@ export function Map() {
 
       const map = mapRef.current as unknown as MapInstance | null;
       const mapInstance = map?.getMapInstance?.();
-      if (!mapInstance || !event?.point) return;
+      if (!mapInstance || !event?.point) {
+        handleDroppedPin(lng, lat);
+        return;
+      }
 
       const hit = findPoiAtPoint(mapInstance, event.point, lngLat);
-      if (!hit) return;
-
-      handlePoiSelect(hit);
+      if (hit) {
+        handlePoiSelect(hit);
+      } else {
+        handleDroppedPin(lng, lat);
+      }
     },
-    [appendWaypoint, flyToCoords, handlePoiSelect],
+    [appendWaypoint, flyToCoords, handlePoiSelect, handleDroppedPin],
   );
 
   useEffect(() => {
