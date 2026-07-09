@@ -260,9 +260,13 @@ export function Map() {
 
       removeDashedRoute(mapInstance);
 
-      map.clearMarkers();
-      map.clearRoute();
-      map.clearPaths();
+      try {
+        map.clearMarkers();
+        map.clearRoute();
+        map.clearPaths();
+      } catch (error) {
+        console.error("failed to clear route from map:", error);
+      }
     }
   }, []);
 
