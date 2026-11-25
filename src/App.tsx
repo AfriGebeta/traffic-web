@@ -10,6 +10,7 @@ import { OpenInAppBanner } from './components/OpenInAppBanner';
 import { OnboardAuth } from './modules/auth/onboard/OnboardAuth';
 import TelegramAuthCompletion from './modules/auth/telegram-auth-completion/TelegramAuthCompletion';
 import { HelmetProvider } from 'react-helmet-async';
+import { SharePage } from './modules/shares/SharePage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/delete-account" element={<DeleteAccountPage />} />
+          <Route path="/s/:code" element={<SharePage />} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </BrowserRouter>
